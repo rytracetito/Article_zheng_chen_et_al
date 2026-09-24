@@ -68,8 +68,13 @@ etude_puissance(h = 1000, gen_H0, T, est_modele("Wiener"), sim_modele("Wiener"),
 
 ## Limites connues
 
-- Les estimateurs Gamma/IG (homogenes et non-homogenes) exigent des increments
-  strictement positifs ; une erreur explicite est levee sinon.
+- Les estimateurs Gamma/IG (homogenes et non-homogenes) refusent les increments
+  negatifs (erreur explicite). Un increment exactement nul, du a l'arrondi machine
+  quand la forme `alpha * dt` est tres petite, est remplace par
+  `.Machine$double.eps * max(abs(X))` avec un avertissement ; cet avertissement
+  n'est pas affiche pour les repliques bootstrap de `test_gof()`.
+- Le pas de temps peut etre irregulier, mais toutes les trajectoires doivent
+  partager les memes instants `T`.
 - `estimer_wiener_nonhomog()` et `estimer_gamma_nonhomog()` recherchent `r`
   sur un intervalle borne (`[0.05, 10]` pour Wiener, recherche libre pour
   Gamma) ; aucune garantie mathematique d'optimalite globale n'est etablie

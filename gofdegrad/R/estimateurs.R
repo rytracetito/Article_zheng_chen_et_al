@@ -1,3 +1,36 @@
+#' Increments strictement positifs pour les modeles Gamma et IG
+#'
+#' Calcule les increments des trajectoires. Un increment negatif leve une
+#' erreur (donnees incompatibles avec un processus monotone). Un increment
+#' exactement nul provient de l'arrondi machine : un increment de loi Gamma
+#' ou IG tres petit devant le niveau de la trajectoire disparait lors de la
+#' somme cumulee. Il est remplace par \eqn{\epsilon_{machine} \max|X|},
+#' borne superieure de sa vraie valeur, avec un avertissement.
+#'
+#' @param X Matrice \eqn{m \times n} des trajectoires.
+#' @param nom Nom de l'estimateur appelant, repris dans les messages.
+#' @param modele Nom du modele, repris dans les messages.
+#'
+#' @return Matrice \eqn{m \times n} des increments, strictement positifs.
+#'
+#' @keywords internal
+increments_positifs <- function(X, nom, modele) {
+  n <- ncol(X)
+  dX <- X - cbind(0, X[, -n, drop = FALSE])
+  if (any(dX < 0)) {
+    stop(nom, " : increments negatifs presents, incompatible avec un modele ", modele, call. = FALSE)
+  }
+  nuls <- dX == 0
+  if (any(nuls)) {
+    plancher <- .Machine$double.eps * max(abs(X))
+    if (plancher == 0) stop(nom, " : aucun increment strictement positif", call. = FALSE)
+    dX[nuls] <- plancher
+    warning(sprintf("%s : %d increment(s) nul(s) remplace(s) par %.3g (precision machine)",
+                    nom, sum(nuls), plancher), call. = FALSE)
+  }
+  dX
+}
+
 #' Estimation MLE - Wiener homogene
 #'
 #' Estime par maximum de vraisemblance les parametres d'un processus de
@@ -45,8 +78,7 @@ estimer_wiener_homogene <- function(X, T) {
 estimer_gamma_homogene <- function(X, T) {
   m <- nrow(X); n <- ncol(X)
   dt <- diff(c(0, T)); t_n <- T[n]
-  dX <- X - cbind(0, X[, -n, drop = FALSE])
-  if (any(dX <= 0)) stop("estimer_gamma_homogene : increments negatifs ou nuls presents, incompatible avec un modele Gamma")
+  dX <- increments_positifs(X, "estimer_gamma_homogene", "Gamma")
   dt_mat <- matrix(dt, m, n, byrow = TRUE)
   S1 <- sum(dX)
   beta_de_alpha <- function(alpha) S1 / (alpha * m * t_n)
@@ -78,8 +110,7 @@ estimer_gamma_homogene <- function(X, T) {
 estimer_ig_homogene <- function(X, T) {
   m <- nrow(X); n <- ncol(X)
   dt <- diff(c(0, T)); t_n <- T[n]
-  dX <- X - cbind(0, X[, -n, drop = FALSE])
-  if (any(dX <= 0)) stop("estimer_ig_homogene : increments negatifs ou nuls presents, incompatible avec un modele IG")
+  dX <- increments_positifs(X, "estimer_ig_homogene", "IG")
   dt_mat <- matrix(dt, m, n, byrow = TRUE)
   A <- sum(dX); B <- m * t_n; C <- sum(dt_mat^2 / dX)
   mu_IG_hat <- A / B
@@ -151,8 +182,7 @@ estimer_wiener_nonhomog <- function(X, T) {
 estimer_gamma_nonhomog <- function(X, T) {
   m <- nrow(X); n <- ncol(X)
   dt <- diff(c(0, T))
-  dX <- X - cbind(0, X[, -n, drop = FALSE])
-  if (any(dX <= 0)) stop("estimer_gamma_nonhomog : increments negatifs ou nuls presents, incompatible avec un modele Gamma")
+  dX <- increments_positifs(X, "estimer_gamma_nonhomog", "Gamma")
   S1 <- sum(dX)
 
   neg_profile_loglik <- function(par) {

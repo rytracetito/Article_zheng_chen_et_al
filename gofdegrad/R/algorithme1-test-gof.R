@@ -86,7 +86,7 @@ test_gof <- function(X, T, est, sim, mp = 100 * nrow(X), L = 1000, alpha = 0.05)
   S_star <- matrix(NA_real_, L, length(S_obs), dimnames = list(NULL, names(S_obs)))
   for (v in seq_len(L)) {
     Xb <- sim(th, T, m)
-    th_b <- est(Xb, T)
+    th_b <- suppressWarnings(est(Xb, T))
     S_star[v, ] <- stats_sim(Xb, sim(th_b, T, mp))
   }
   s_crit <- apply(S_star, 2, stats::quantile, probs = 1 - alpha, names = FALSE)

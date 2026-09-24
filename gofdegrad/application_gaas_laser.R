@@ -73,7 +73,7 @@ p_valeurs <- t(sapply(resultats, `[[`, "p_valeur"))
 rejets    <- t(sapply(resultats, `[[`, "rejet"))
 
 cat("\n== p-valeurs ==\n")
-print(round(p_valeurs, 3))
+print(round(p_valeurs, 5))
 
 cat("\n== Rejet de H0 ==\n")
 print(rejets)

@@ -1,7 +1,7 @@
 Package: gofdegrad
 Type: Package
 Title: Goodness-of-Fit Tests for Degradation Processes
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Rytrace", "Tito", email = "tito.amedee-rytrace@univ-pau.fr", role = c("aut", "cre", "cph"))
 Description: Implementation of the goodness-of-fit testing method by similarity
     measures and parametric bootstrap of Zheng, Wang, Chen & Xie (2026,
