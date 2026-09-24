@@ -1,0 +1,15 @@
+# Fichiers de session R
+.Rhistory
+.RData
+.Rapp.history
+.Ruserdata
+.Rproj.user/
+
+# Produits de construction du package
+*.tar.gz
+*.Rcheck/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
