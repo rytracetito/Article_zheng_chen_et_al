@@ -1,5 +1,3 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-^test_gofdegrad\.R$
-^application_gaas_laser\.R$
