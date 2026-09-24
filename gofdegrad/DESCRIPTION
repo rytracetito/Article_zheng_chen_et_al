@@ -1,0 +1,22 @@
+Package: gofdegrad
+Type: Package
+Title: Goodness-of-Fit Tests for Degradation Processes
+Version: 0.1.0
+Authors@R: person("Rytrace", "Tito", email = "tito.amedee-rytrace@univ-pau.fr", role = c("aut", "cre", "cph"))
+Description: Implementation of the goodness-of-fit testing method by similarity
+    measures and parametric bootstrap of Zheng, Wang, Chen & Xie (2026,
+    Quality and Reliability Engineering International). Supports Wiener,
+    Gamma and Inverse Gaussian stochastic process degradation models
+    (homogeneous and non-homogeneous), and general path degradation models
+    (linear, power law, exponential).
+License: MIT + file LICENSE
+URL: https://github.com/rytracetito/Article_zheng_chen_et_al
+BugReports: https://github.com/rytracetito/Article_zheng_chen_et_al/issues
+Encoding: UTF-8
+RoxygenNote: 7.3.3
+Imports:
+    stats,
+    statmod
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
