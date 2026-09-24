@@ -13,3 +13,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Sortie graphique par defaut de R
+Rplots.pdf
