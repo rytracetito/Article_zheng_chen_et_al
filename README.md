@@ -9,7 +9,7 @@ https://doi.org/10.1002/qre.70382
 
 ## Contenu
 
-- `Implémentation_R/` : scripts R (algorithmes 1 à 3, estimateurs MLE, tests, application aux données Laser)
+- `Implementation_R/` : scripts R (algorithmes 1 à 3, estimateurs MLE, tests, application aux données Laser)
 - `Explication_md/` : explications détaillées des algorithmes et démonstrations (`.md` et `.html`)
 - `gofdegrad/` : package R issu de ces scripts
 
