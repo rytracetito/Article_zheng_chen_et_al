@@ -1,0 +1,22 @@
+#' gofdegrad : Tests d'adequation pour processus de degradation
+#'
+#' Implementation du test d'adequation par similarite de trajectoires et
+#' bootstrap parametrique de Zheng, Wang, Chen & Xie (2026, Quality and
+#' Reliability Engineering International, \doi{10.1002/qre.70382}).
+#'
+#' @section Modeles disponibles:
+#' \describe{
+#'   \item{\code{"Wiener"}}{Wiener homogene}
+#'   \item{\code{"Gamma"}}{Gamma homogene}
+#'   \item{\code{"IG"}}{Inverse Gaussien homogene}
+#'   \item{\code{"Wiener_nonhomog"}}{Wiener non-homogene, \eqn{\Lambda(t) = t^r}}
+#'   \item{\code{"Gamma_nonhomog"}}{Gamma non-homogene, \eqn{\Lambda(t) = t^r}}
+#' }
+#'
+#' @section Point d'entree typique:
+#' \code{\link{sim_proc}} / \code{\link{sim_traj}} pour simuler,
+#' \code{\link{estimer_parametres}} pour estimer, \code{\link{test_gof}}
+#' pour tester, \code{\link{etude_puissance}} pour le niveau/la puissance.
+#'
+#' @keywords internal
+"_PACKAGE"
