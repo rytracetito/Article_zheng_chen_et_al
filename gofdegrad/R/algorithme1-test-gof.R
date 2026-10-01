@@ -1,74 +1,84 @@
-#' Matrice des distances entre trajectoires
+#' Distance matrix between trajectories
 #'
-#' Calcule la matrice \eqn{m \times m'} des distances de similarite entre
-#' chaque trajectoire reelle et chaque trajectoire simulee (eq. 3-4 de
+#' Computes the \eqn{m \times m'} matrix of similarity distances between
+#' each real trajectory and each simulated trajectory (eq. 3-4 of
 #' Zheng, Wang, Chen & Xie, 2026).
 #'
-#' @param X Matrice \eqn{m \times n} de trajectoires reelles (ou bootstrap).
-#' @param Xs Matrice \eqn{m' \times n} de trajectoires simulees.
-#' @param D Mesure de similarite : \code{"KS"} (distance de Chebyshev, par
-#'   analogie avec la statistique de Kolmogorov-Smirnov) ou \code{"CvM"}
-#'   (distance euclidienne au carre).
+#' @param X Matrix of \eqn{m \times n} real (or bootstrap) trajectories.
+#' @param Xs Matrix of \eqn{m' \times n} simulated trajectories.
+#' @param D Similarity measure: \code{"KS"} (Chebyshev distance, by
+#'   analogy with the Kolmogorov-Smirnov statistic) or \code{"CvM"}
+#'   (squared Euclidean distance).
 #'
-#' @return Matrice numerique \eqn{m \times m'}, terme \eqn{(i,k)} egal a
+#' @return Numeric \eqn{m \times m'} matrix, term \eqn{(i,k)} equal to
 #'   \eqn{D(X_i, X'_k)}.
 #'
 #' @keywords internal
 dist_mat <- function(X, Xs, D) {
-  if (D == "CvM") {
-    outer(rowSums(X^2), rowSums(Xs^2), "+") - 2 * X %*% t(Xs)
-  } else {
-    n <- ncol(X)
-    Dm <- matrix(0, nrow(X), nrow(Xs))
-    for (j in seq_len(n)) Dm <- pmax(Dm, abs(outer(X[, j], Xs[, j], "-")))
-    Dm
+    if (D == "CvM") {
+          outer(rowSums(X^2), rowSums(Xs^2), "+") - 2 * X %*% t(Xs)
+        } else {
+          n <- ncol(X)
+          Dm <- matrix(0, nrow(X), nrow(Xs))
+          for (j in seq_len(n)) Dm <- pmax(Dm, abs(outer(X[, j], Xs[, j], "-")))
+          Dm
+        }
   }
-}
 
-#' Statistiques de similarite
+#' Similarity statistics
 #'
-#' Calcule les 4 statistiques de test \eqn{S_{KS-sup}}, \eqn{S_{KS-sum}},
-#' \eqn{S_{CvM-sup}}, \eqn{S_{CvM-sum}} entre des trajectoires et un pool
-#' simule (eq. 6-10 de l'article).
+#' Computes the 4 test statistics \eqn{S_{KS-sup}}, \eqn{S_{KS-sum}},
+#' \eqn{S_{CvM-sup}}, \eqn{S_{CvM-sum}} between a set of trajectories and a
+#' simulated pool (eq. 6-10 of the article).
 #'
-#' @param X Matrice de trajectoires reelles ou bootstrap.
-#' @param Xs Matrice du pool de trajectoires simulees sous le modele candidat.
+#' @param X Matrix of real or bootstrap trajectories.
+#' @param Xs Matrix of the pool of trajectories simulated under the
+#'   candidate model.
 #'
-#' @return Vecteur numerique nomme de longueur 4 :
+#' @return Named numeric vector of length 4:
 #'   \code{c(KS_sup, KS_sum, CvM_sup, CvM_sum)}.
 #'
 #' @export
 stats_sim <- function(X, Xs) {
-  d_KS  <- apply(dist_mat(X, Xs, "KS"),  1, min)
-  d_CvM <- apply(dist_mat(X, Xs, "CvM"), 1, min)
-  c(KS_sup  = max(d_KS),  KS_sum  = sum(d_KS),
-    CvM_sup = max(d_CvM), CvM_sum = sum(d_CvM))
-}
+    d_KS  <- apply(dist_mat(X, Xs, "KS"),  1, min)
+    d_CvM <- apply(dist_mat(X, Xs, "CvM"), 1, min)
+    c(KS_sup  = max(d_KS),  KS_sum  = sum(d_KS),
+          CvM_sup = max(d_CvM), CvM_sum = sum(d_CvM))
+  }
 
-#' Test d'adequation par similarite et bootstrap parametrique
+#' Goodness-of-fit test by similarity and parametric bootstrap
 #'
-#' Implemente l'Algorithme 1 complet de Zheng, Wang, Chen & Xie (2026) :
-#' calcule la statistique observee, le seuil critique par bootstrap
-#' parametrique, et rend la decision de test pour les 4 statistiques
-#' simultanement.
+#' Implements the full Algorithm 1 of Zheng, Wang, Chen & Xie (2026):
+#' computes the observed statistic, the critical threshold by parametric
+#' bootstrap, and returns the test decision for all 4 statistics at once.
 #'
-#' @param X Matrice \eqn{m \times n} des donnees reelles.
-#' @param T Vecteur des \code{n} instants d'observation.
-#' @param est Fonction d'estimation \code{function(X, T) -> theta}, propre
-#'   au modele candidat sous \eqn{H_0} (voir \code{\link{estimer_parametres}}).
-#' @param sim Fonction de simulation \code{function(theta, T, m_traj) ->
-#'   matrice}, propre au modele candidat (voir \code{\link{sim_proc}},
+#' @param X Matrix of \eqn{m \times n} real data.
+#' @param T Vector of the \code{n} observation times.
+#' @param est Estimation function \code{function(X, T) -> theta}, specific
+#'   to the candidate model under \eqn{H_0} (see
+#'   \code{\link{estimer_parametres}}).
+#' @param sim Simulation function \code{function(theta, T, m_traj) ->
+#'   matrix}, specific to the candidate model (see \code{\link{sim_proc}},
 #'   \code{\link{sim_traj}}).
-#' @param mp Taille du pool simule (\eqn{m'}). Par defaut \eqn{100m},
-#'   recommandation de l'article.
-#' @param L Nombre de replications bootstrap. Par defaut 1000.
-#' @param alpha Niveau de signification du test. Par defaut 0.05.
+#' @param mp Size of the simulated pool (\eqn{m'}). Defaults to \eqn{100m},
+#'   the recommendation given in the article.
+#' @param L Number of bootstrap replications. Defaults to 1000.
+#' @param alpha Significance level of the test. Defaults to 0.05.
 #'
-#' @return Une liste avec les elements :
-#'   \item{rejet}{vecteur logique de longueur 4, \code{TRUE} = \eqn{H_0} rejetee}
-#'   \item{S_obs}{statistiques observees}
-#'   \item{s_crit}{valeurs critiques (quantile empirique d'ordre \eqn{1-\alpha})}
-#'   \item{p_valeur}{p-valeurs empiriques}
+#' @return A list with elements:
+#'   \item{rejet}{logical vector of length 4, \code{TRUE} = \eqn{H_0} rejected}
+#'   \item{S_obs}{observed statistics}
+#'   \item{s_crit}{critical values (empirical quantile of order \eqn{1-\alpha})}
+#'   \item{p_valeur}{empirical p-values}
+#'
+#' @details
+#' Inside the bootstrap loop, warnings raised by \code{est} (for example the
+#' zero-increment tolerance warning issued by
+#' \code{\link{estimer_gamma_homogene}}, \code{\link{estimer_ig_homogene}}
+#' and \code{\link{estimer_gamma_nonhomog}} via their shared helper) are
+#' suppressed, since they would otherwise be repeated up to \code{L} times
+#' for a single call to \code{test_gof}. A warning raised on the real data
+#' (outside the loop) is not suppressed.
 #'
 #' @examples
 #' T <- 1:50
@@ -79,17 +89,17 @@ stats_sim <- function(X, Xs) {
 #'
 #' @export
 test_gof <- function(X, T, est, sim, mp = 100 * nrow(X), L = 1000, alpha = 0.05) {
-  m <- nrow(X)
-  th <- est(X, T)
-  S_obs <- stats_sim(X, sim(th, T, mp))
+    m <- nrow(X)
+    th <- est(X, T)
+    S_obs <- stats_sim(X, sim(th, T, mp))
 
-  S_star <- matrix(NA_real_, L, length(S_obs), dimnames = list(NULL, names(S_obs)))
-  for (v in seq_len(L)) {
-    Xb <- sim(th, T, m)
-    th_b <- suppressWarnings(est(Xb, T))
-    S_star[v, ] <- stats_sim(Xb, sim(th_b, T, mp))
+    S_star <- matrix(NA_real_, L, length(S_obs), dimnames = list(NULL, names(S_obs)))
+    for (v in seq_len(L)) {
+          Xb <- sim(th, T, m)
+          th_b <- suppressWarnings(est(Xb, T))
+          S_star[v, ] <- stats_sim(Xb, sim(th_b, T, mp))
+        }
+    s_crit <- apply(S_star, 2, stats::quantile, probs = 1 - alpha, names = FALSE)
+    list(rejet = S_obs > s_crit, S_obs = S_obs, s_crit = s_crit,
+                p_valeur = colMeans(sweep(S_star, 2, S_obs, ">=")))
   }
-  s_crit <- apply(S_star, 2, stats::quantile, probs = 1 - alpha, names = FALSE)
-  list(rejet = S_obs > s_crit, S_obs = S_obs, s_crit = s_crit,
-       p_valeur = colMeans(sweep(S_star, 2, S_obs, ">=")))
-}
