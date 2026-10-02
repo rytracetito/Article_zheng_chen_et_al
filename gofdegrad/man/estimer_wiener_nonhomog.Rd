@@ -2,24 +2,24 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_wiener_nonhomog}
 \alias{estimer_wiener_nonhomog}
-\title{Estimation MLE - Wiener non-homogene}
+\title{MLE estimation - non-homogeneous Wiener}
 \usage{
 estimer_wiener_nonhomog(X, T)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 }
 \value{
-Liste \code{list(mu_W, sigma, r)}.
+List \code{list(mu_W, sigma, r)}.
 }
 \description{
-Estime par maximum de vraisemblance les parametres d'un processus de
-Wiener non-homogene, \eqn{\Lambda(t) = t^r}. \eqn{\hat\mu_W(r)} et
-\eqn{\hat\sigma^2(r)} ont une forme close ; \eqn{r} est recherche
-numeriquement en 1D (maximiser la vraisemblance profilee equivaut a
-minimiser \eqn{\hat\sigma^2(r)}).
+Maximum likelihood estimation of the parameters of a non-homogeneous
+Wiener process, \eqn{\Lambda(t) = t^r}. \eqn{\hat\mu_W(r)} and
+\eqn{\hat\sigma^2(r)} have a closed form; \eqn{r} is searched
+numerically in 1D (maximizing the profile likelihood is equivalent to
+minimizing \eqn{\hat\sigma^2(r)}).
 }
 \examples{
 T <- 1:50
