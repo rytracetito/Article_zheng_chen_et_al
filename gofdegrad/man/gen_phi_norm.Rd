@@ -2,25 +2,25 @@
 % Please edit documentation in R/algorithme3-simulateurs-trajectoire.R
 \name{gen_phi_norm}
 \alias{gen_phi_norm}
-\title{Generateur gaussien d'effets aleatoires}
+\title{Gaussian generator of random effects}
 \usage{
 gen_phi_norm(mu, sd)
 }
 \arguments{
-\item{mu}{Moyenne(s) des composantes de \eqn{\phi} : un seul nombre pour
-les modeles \code{"lineaire"}/\code{"exponentiel"}, un vecteur de
-longueur 2 pour \code{"loi_puissance"}.}
+\item{mu}{Mean(s) of the \eqn{\phi} components: a single number for the
+\code{"lineaire"}/\code{"exponentiel"} models, a vector of length 2
+for \code{"loi_puissance"}.}
 
-\item{sd}{Ecart(s)-type associe(s), meme longueur que \code{mu}.}
+\item{sd}{Standard deviation(s), same length as \code{mu}.}
 }
 \value{
-Une fonction \code{function(mp)} qui retourne \code{mp} tirages
-  de \eqn{\phi} : un vecteur si \code{length(mu) == 1}, une matrice
-  \code{mp x 2} sinon.
+A function \code{function(mp)} that returns \code{mp} draws of
+  \eqn{\phi}: a vector if \code{length(mu) == 1}, an \code{mp x 2}
+  matrix otherwise.
 }
 \description{
-Construit une fonction de tirage des effets aleatoires \eqn{\phi_k} sous
-hypothese de normalite, a utiliser comme argument \code{gen_phi} de
+Builds a sampling function for the random effects \eqn{\phi_k} under a
+normality assumption, for use as the \code{gen_phi} argument of
 \code{\link{sim_traj}}.
 }
 \examples{
