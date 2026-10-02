@@ -1,22 +1,22 @@
-#' gofdegrad : Tests d'adequation pour processus de degradation
+#' gofdegrad: Goodness-of-Fit Tests for Degradation Processes
 #'
-#' Implementation du test d'adequation par similarite de trajectoires et
-#' bootstrap parametrique de Zheng, Wang, Chen & Xie (2026, Quality and
-#' Reliability Engineering International, \doi{10.1002/qre.70382}).
+#' Implementation of the goodness-of-fit testing method by similarity
+#' measures and parametric bootstrap of Zheng, Wang, Chen & Xie (2026,
+#' Quality and Reliability Engineering International, \doi{10.1002/qre.70382}).
 #'
-#' @section Modeles disponibles:
+#' @section Available models:
 #' \describe{
-#'   \item{\code{"Wiener"}}{Wiener homogene}
-#'   \item{\code{"Gamma"}}{Gamma homogene}
-#'   \item{\code{"IG"}}{Inverse Gaussien homogene}
-#'   \item{\code{"Wiener_nonhomog"}}{Wiener non-homogene, \eqn{\Lambda(t) = t^r}}
-#'   \item{\code{"Gamma_nonhomog"}}{Gamma non-homogene, \eqn{\Lambda(t) = t^r}}
+#'   \item{\code{"Wiener"}}{Homogeneous Wiener}
+#'   \item{\code{"Gamma"}}{Homogeneous Gamma}
+#'   \item{\code{"IG"}}{Homogeneous Inverse Gaussian}
+#'   \item{\code{"Wiener_nonhomog"}}{Non-homogeneous Wiener, \eqn{\Lambda(t) = t^r}}
+#'   \item{\code{"Gamma_nonhomog"}}{Non-homogeneous Gamma, \eqn{\Lambda(t) = t^r}}
 #' }
 #'
-#' @section Point d'entree typique:
-#' \code{\link{sim_proc}} / \code{\link{sim_traj}} pour simuler,
-#' \code{\link{estimer_parametres}} pour estimer, \code{\link{test_gof}}
-#' pour tester, \code{\link{etude_puissance}} pour le niveau/la puissance.
+#' @section Typical entry points:
+#' \code{\link{sim_proc}} / \code{\link{sim_traj}} to simulate,
+#' \code{\link{estimer_parametres}} to estimate, \code{\link{test_gof}}
+#' to test, \code{\link{etude_puissance}} for the level/power study.
 #'
 #' @keywords internal
 "_PACKAGE"
