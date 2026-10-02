@@ -2,24 +2,24 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_parametres}
 \alias{estimer_parametres}
-\title{Dispatcher d'estimation MLE}
+\title{MLE estimation dispatcher}
 \usage{
 estimer_parametres(X, T, modele)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 
-\item{modele}{Chaine de caracteres : \code{"Wiener"}, \code{"Gamma"},
-\code{"IG"}, \code{"Wiener_nonhomog"} ou \code{"Gamma_nonhomog"}.}
+\item{modele}{Character string: \code{"Wiener"}, \code{"Gamma"},
+\code{"IG"}, \code{"Wiener_nonhomog"} or \code{"Gamma_nonhomog"}.}
 }
 \value{
-La liste de parametres retournee par l'estimateur correspondant.
+The parameter list returned by the corresponding estimator.
 }
 \description{
-Selectionne et applique l'estimateur MLE correspondant au modele candidat
-demande.
+Selects and applies the MLE estimator corresponding to the requested
+candidate model.
 }
 \examples{
 T <- 1:50
