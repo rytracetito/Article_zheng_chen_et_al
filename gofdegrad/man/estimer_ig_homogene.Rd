@@ -2,21 +2,21 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_ig_homogene}
 \alias{estimer_ig_homogene}
-\title{Estimation MLE - Inverse Gaussien homogene}
+\title{MLE estimation - homogeneous Inverse Gaussian}
 \usage{
 estimer_ig_homogene(X, T)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 }
 \value{
-Liste \code{list(mu_IG, eta)}.
+List \code{list(mu_IG, eta)}.
 }
 \description{
-Estime par maximum de vraisemblance les parametres d'un processus
-Inverse Gaussien homogene (\eqn{\Lambda(t) = t}).
+Maximum likelihood estimation of the parameters of a homogeneous
+Inverse Gaussian process (\eqn{\Lambda(t) = t}).
 }
 \examples{
 T <- 1:50
