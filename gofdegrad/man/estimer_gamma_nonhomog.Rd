@@ -2,22 +2,23 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_gamma_nonhomog}
 \alias{estimer_gamma_nonhomog}
-\title{Estimation MLE - Gamma non-homogene}
+\title{MLE estimation - non-homogeneous Gamma}
 \usage{
 estimer_gamma_nonhomog(X, T)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 }
 \value{
-Liste \code{list(alpha, beta, r)}.
+List \code{list(alpha, beta, r)}.
 }
 \description{
-Estime par maximum de vraisemblance les parametres d'un processus Gamma
-non-homogene, \eqn{\Lambda(t) = t^r}. \eqn{\beta} a une forme close a
-\eqn{(\alpha, r)} fixes ; \eqn{(\alpha, r)} recherches numeriquement en 2D.
+Maximum likelihood estimation of the parameters of a non-homogeneous
+Gamma process, \eqn{\Lambda(t) = t^r}. \eqn{\beta} has a closed form
+for fixed \eqn{(\alpha, r)}; \eqn{(\alpha, r)} are searched numerically
+in 2D.
 }
 \examples{
 T <- 1:50
