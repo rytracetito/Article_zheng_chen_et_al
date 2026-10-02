@@ -2,24 +2,24 @@
 % Please edit documentation in R/dispatchers.R
 \name{sim_modele}
 \alias{sim_modele}
-\title{Fermeture de simulation liee a un modele}
+\title{Simulation closure bound to a model}
 \usage{
 sim_modele(modele)
 }
 \arguments{
-\item{modele}{Chaine de caracteres : \code{"Wiener"}, \code{"Gamma"},
-\code{"IG"}, \code{"Wiener_nonhomog"} ou \code{"Gamma_nonhomog"}.}
+\item{modele}{Character string: \code{"Wiener"}, \code{"Gamma"},
+\code{"IG"}, \code{"Wiener_nonhomog"} or \code{"Gamma_nonhomog"}.}
 }
 \value{
-Une fonction \code{function(theta, T, m_traj) -> matrice}.
+A function \code{function(theta, T, m_traj) -> matrix}.
 }
 \description{
-Construit une fonction de simulation \code{function(theta, T, m_traj)}
-liee a un nom de modele, utilisable directement comme argument \code{sim}
-de \code{\link{test_gof}}. Gere en interne la traduction des modeles
-non-homogenes (\code{"Wiener_nonhomog"}, \code{"Gamma_nonhomog"}) vers
-\code{\link{sim_proc}} avec la fonction de tendance \eqn{\Lambda(t) = t^r}
-correspondante, \code{r} etant lu dans \code{theta$r}.
+Builds a simulation function \code{function(theta, T, m_traj)} bound to
+a model name, usable directly as the \code{sim} argument of
+\code{\link{test_gof}}. Internally handles the translation of the
+non-homogeneous models (\code{"Wiener_nonhomog"}, \code{"Gamma_nonhomog"})
+into \code{\link{sim_proc}} with the corresponding trend function
+\eqn{\Lambda(t) = t^r}, \code{r} being read from \code{theta$r}.
 }
 \examples{
 sim_w <- sim_modele("Wiener")
