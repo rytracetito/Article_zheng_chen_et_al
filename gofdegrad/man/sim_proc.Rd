@@ -2,35 +2,35 @@
 % Please edit documentation in R/algorithme2-simulateurs-processus.R
 \name{sim_proc}
 \alias{sim_proc}
-\title{Simulation de trajectoires sous un modele a processus stochastique}
+\title{Simulate trajectories under a stochastic process model}
 \usage{
 sim_proc(T, th, mod, mp, Lam = identity)
 }
 \arguments{
-\item{T}{Vecteur numerique des \code{n} instants d'observation
-\eqn{(t_1, \dots, t_n)}. \eqn{t_0 = 0} est ajoute automatiquement.}
+\item{T}{Numeric vector of the \code{n} observation times
+\eqn{(t_1, \dots, t_n)}. \eqn{t_0 = 0} is added automatically.}
 
-\item{th}{Liste des parametres du modele : \code{list(mu_W, sigma)} pour
-\code{"Wiener"}, \code{list(alpha, beta)} pour \code{"Gamma"},
-\code{list(mu_IG, eta)} pour \code{"IG"}.}
+\item{th}{List of model parameters: \code{list(mu_W, sigma)} for
+\code{"Wiener"}, \code{list(alpha, beta)} for \code{"Gamma"},
+\code{list(mu_IG, eta)} for \code{"IG"}.}
 
-\item{mod}{Chaine de caracteres : \code{"Wiener"}, \code{"Gamma"} ou
+\item{mod}{Character string: \code{"Wiener"}, \code{"Gamma"} or
 \code{"IG"}.}
 
-\item{mp}{Nombre entier de trajectoires \eqn{m'} a simuler.}
+\item{mp}{Integer number of trajectories \eqn{m'} to simulate.}
 
-\item{Lam}{Fonction de tendance \eqn{\Lambda(t)}. Par defaut
-\code{identity} (cas homogene, \eqn{\Lambda(t) = t}).}
+\item{Lam}{Trend function \eqn{\Lambda(t)}. Defaults to \code{identity}
+(homogeneous case, \eqn{\Lambda(t) = t}).}
 }
 \value{
-Matrice numerique \eqn{m' \times n} des trajectoires simulees ;
-  la ligne \code{k} est la trajectoire \eqn{X'_k = [x'_{k,1}, \dots, x'_{k,n}]}.
+Numeric \eqn{m' \times n} matrix of simulated trajectories; row
+  \code{k} is the trajectory \eqn{X'_k = [x'_{k,1}, \dots, x'_{k,n}]}.
 }
 \description{
-Genere \code{mp} trajectoires de degradation simulees sous un modele
-Wiener, Gamma ou Inverse Gaussien, homogene ou non-homogene, aux memes
-instants d'observation que des donnees reelles (Algorithme 2 de
-Zheng, Wang, Chen & Xie, 2026).
+Generates \code{mp} simulated degradation trajectories under a Wiener,
+Gamma or Inverse Gaussian model, homogeneous or non-homogeneous, at the
+same observation times as real data (Algorithm 2 of Zheng, Wang, Chen &
+Xie, 2026).
 }
 \examples{
 T <- 1:50
