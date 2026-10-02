@@ -2,26 +2,27 @@
 % Please edit documentation in R/estimateurs.R
 \name{increments_positifs}
 \alias{increments_positifs}
-\title{Increments strictement positifs pour les modeles Gamma et IG}
+\title{Strictly positive increments for the Gamma and IG models}
 \usage{
 increments_positifs(X, nom, modele)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires.}
+\item{X}{Matrix of \eqn{m \times n} trajectories.}
 
-\item{nom}{Nom de l'estimateur appelant, repris dans les messages.}
+\item{nom}{Name of the calling estimator, reused in the messages.}
 
-\item{modele}{Nom du modele, repris dans les messages.}
+\item{modele}{Name of the model, reused in the messages.}
 }
 \value{
-Matrice \eqn{m \times n} des increments, strictement positifs.
+Matrix of \eqn{m \times n} increments, strictly positive.
 }
 \description{
-Calcule les increments des trajectoires. Un increment negatif leve une
-erreur (donnees incompatibles avec un processus monotone). Un increment
-exactement nul provient de l'arrondi machine : un increment de loi Gamma
-ou IG tres petit devant le niveau de la trajectoire disparait lors de la
-somme cumulee. Il est remplace par \eqn{\epsilon_{machine} \max|X|},
-borne superieure de sa vraie valeur, avec un avertissement.
+Computes the trajectory increments. A strictly negative increment
+raises an error (data incompatible with a monotone process). An
+increment of exactly zero is treated as machine-precision rounding: a
+Gamma or IG increment that is very small compared to the level of the
+trajectory can vanish during the cumulative sum. It is replaced by
+\eqn{\epsilon_{machine} \max|X|}, an upper bound on its true value,
+with a warning.
 }
 \keyword{internal}
