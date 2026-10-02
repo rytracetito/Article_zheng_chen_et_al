@@ -2,23 +2,23 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_gamma_homogene}
 \alias{estimer_gamma_homogene}
-\title{Estimation MLE - Gamma homogene}
+\title{MLE estimation - homogeneous Gamma}
 \usage{
 estimer_gamma_homogene(X, T)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 }
 \value{
-Liste \code{list(alpha, beta)}.
+List \code{list(alpha, beta)}.
 }
 \description{
-Estime par maximum de vraisemblance les parametres d'un processus Gamma
-homogene (\eqn{\Lambda(t) = t}). Pas de forme close pour \eqn{\alpha}
-(fonction digamma) : \eqn{\beta} est profile analytiquement, \eqn{\alpha}
-recherche numeriquement en 1D.
+Maximum likelihood estimation of the parameters of a homogeneous Gamma
+process (\eqn{\Lambda(t) = t}). There is no closed form for \eqn{\alpha}
+(digamma function): \eqn{\beta} is profiled analytically, \eqn{\alpha}
+is searched numerically in 1D.
 }
 \examples{
 T <- 1:50
