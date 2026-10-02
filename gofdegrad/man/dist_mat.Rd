@@ -2,26 +2,26 @@
 % Please edit documentation in R/algorithme1-test-gof.R
 \name{dist_mat}
 \alias{dist_mat}
-\title{Matrice des distances entre trajectoires}
+\title{Distance matrix between trajectories}
 \usage{
 dist_mat(X, Xs, D)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} de trajectoires reelles (ou bootstrap).}
+\item{X}{Matrix of \eqn{m \times n} real (or bootstrap) trajectories.}
 
-\item{Xs}{Matrice \eqn{m' \times n} de trajectoires simulees.}
+\item{Xs}{Matrix of \eqn{m' \times n} simulated trajectories.}
 
-\item{D}{Mesure de similarite : \code{"KS"} (distance de Chebyshev, par
-analogie avec la statistique de Kolmogorov-Smirnov) ou \code{"CvM"}
-(distance euclidienne au carre).}
+\item{D}{Similarity measure: \code{"KS"} (Chebyshev distance, by
+analogy with the Kolmogorov-Smirnov statistic) or \code{"CvM"}
+(squared Euclidean distance).}
 }
 \value{
-Matrice numerique \eqn{m \times m'}, terme \eqn{(i,k)} egal a
+Numeric \eqn{m \times m'} matrix, term \eqn{(i,k)} equal to
   \eqn{D(X_i, X'_k)}.
 }
 \description{
-Calcule la matrice \eqn{m \times m'} des distances de similarite entre
-chaque trajectoire reelle et chaque trajectoire simulee (eq. 3-4 de
+Computes the \eqn{m \times m'} matrix of similarity distances between
+each real trajectory and each simulated trajectory (eq. 3-4 of
 Zheng, Wang, Chen & Xie, 2026).
 }
 \keyword{internal}
