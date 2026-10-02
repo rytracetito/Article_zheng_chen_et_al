@@ -2,21 +2,21 @@
 % Please edit documentation in R/estimateurs.R
 \name{estimer_wiener_homogene}
 \alias{estimer_wiener_homogene}
-\title{Estimation MLE - Wiener homogene}
+\title{MLE estimation - homogeneous Wiener}
 \usage{
 estimer_wiener_homogene(X, T)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des trajectoires observees.}
+\item{X}{Matrix of \eqn{m \times n} observed trajectories.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 }
 \value{
-Liste \code{list(mu_W, sigma)}.
+List \code{list(mu_W, sigma)}.
 }
 \description{
-Estime par maximum de vraisemblance les parametres d'un processus de
-Wiener homogene (\eqn{\Lambda(t) = t}).
+Maximum likelihood estimation of the parameters of a homogeneous Wiener
+process (\eqn{\Lambda(t) = t}).
 }
 \examples{
 T <- 1:50
