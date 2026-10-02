@@ -2,21 +2,22 @@
 % Please edit documentation in R/algorithme1-test-gof.R
 \name{stats_sim}
 \alias{stats_sim}
-\title{Statistiques de similarite}
+\title{Similarity statistics}
 \usage{
 stats_sim(X, Xs)
 }
 \arguments{
-\item{X}{Matrice de trajectoires reelles ou bootstrap.}
+\item{X}{Matrix of real or bootstrap trajectories.}
 
-\item{Xs}{Matrice du pool de trajectoires simulees sous le modele candidat.}
+\item{Xs}{Matrix of the pool of trajectories simulated under the
+candidate model.}
 }
 \value{
-Vecteur numerique nomme de longueur 4 :
+Named numeric vector of length 4:
   \code{c(KS_sup, KS_sum, CvM_sup, CvM_sum)}.
 }
 \description{
-Calcule les 4 statistiques de test \eqn{S_{KS-sup}}, \eqn{S_{KS-sum}},
-\eqn{S_{CvM-sup}}, \eqn{S_{CvM-sum}} entre des trajectoires et un pool
-simule (eq. 6-10 de l'article).
+Computes the 4 test statistics \eqn{S_{KS-sup}}, \eqn{S_{KS-sum}},
+\eqn{S_{CvM-sup}}, \eqn{S_{CvM-sum}} between a set of trajectories and a
+simulated pool (eq. 6-10 of the article).
 }
