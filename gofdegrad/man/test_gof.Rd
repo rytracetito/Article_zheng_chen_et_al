@@ -2,41 +2,50 @@
 % Please edit documentation in R/algorithme1-test-gof.R
 \name{test_gof}
 \alias{test_gof}
-\title{Test d'adequation par similarite et bootstrap parametrique}
+\title{Goodness-of-fit test by similarity and parametric bootstrap}
 \usage{
 test_gof(X, T, est, sim, mp = 100 * nrow(X), L = 1000, alpha = 0.05)
 }
 \arguments{
-\item{X}{Matrice \eqn{m \times n} des donnees reelles.}
+\item{X}{Matrix of \eqn{m \times n} real data.}
 
-\item{T}{Vecteur des \code{n} instants d'observation.}
+\item{T}{Vector of the \code{n} observation times.}
 
-\item{est}{Fonction d'estimation \code{function(X, T) -> theta}, propre
-au modele candidat sous \eqn{H_0} (voir \code{\link{estimer_parametres}}).}
+\item{est}{Estimation function \code{function(X, T) -> theta}, specific
+to the candidate model under \eqn{H_0} (see
+\code{\link{estimer_parametres}}).}
 
-\item{sim}{Fonction de simulation \code{function(theta, T, m_traj) ->
-matrice}, propre au modele candidat (voir \code{\link{sim_proc}},
+\item{sim}{Simulation function \code{function(theta, T, m_traj) ->
+matrix}, specific to the candidate model (see \code{\link{sim_proc}},
 \code{\link{sim_traj}}).}
 
-\item{mp}{Taille du pool simule (\eqn{m'}). Par defaut \eqn{100m},
-recommandation de l'article.}
+\item{mp}{Size of the simulated pool (\eqn{m'}). Defaults to \eqn{100m},
+the recommendation given in the article.}
 
-\item{L}{Nombre de replications bootstrap. Par defaut 1000.}
+\item{L}{Number of bootstrap replications. Defaults to 1000.}
 
-\item{alpha}{Niveau de signification du test. Par defaut 0.05.}
+\item{alpha}{Significance level of the test. Defaults to 0.05.}
 }
 \value{
-Une liste avec les elements :
-  \item{rejet}{vecteur logique de longueur 4, \code{TRUE} = \eqn{H_0} rejetee}
-  \item{S_obs}{statistiques observees}
-  \item{s_crit}{valeurs critiques (quantile empirique d'ordre \eqn{1-\alpha})}
-  \item{p_valeur}{p-valeurs empiriques}
+A list with elements:
+  \item{rejet}{logical vector of length 4, \code{TRUE} = \eqn{H_0} rejected}
+  \item{S_obs}{observed statistics}
+  \item{s_crit}{critical values (empirical quantile of order \eqn{1-\alpha})}
+  \item{p_valeur}{empirical p-values}
 }
 \description{
-Implemente l'Algorithme 1 complet de Zheng, Wang, Chen & Xie (2026) :
-calcule la statistique observee, le seuil critique par bootstrap
-parametrique, et rend la decision de test pour les 4 statistiques
-simultanement.
+Implements the full Algorithm 1 of Zheng, Wang, Chen & Xie (2026):
+computes the observed statistic, the critical threshold by parametric
+bootstrap, and returns the test decision for all 4 statistics at once.
+}
+\details{
+Inside the bootstrap loop, warnings raised by \code{est} (for example the
+zero-increment tolerance warning issued by
+\code{\link{estimer_gamma_homogene}}, \code{\link{estimer_ig_homogene}}
+and \code{\link{estimer_gamma_nonhomog}} via their shared helper) are
+suppressed, since they would otherwise be repeated up to \code{L} times
+for a single call to \code{test_gof}. A warning raised on the real data
+(outside the loop) is not suppressed.
 }
 \examples{
 T <- 1:50
