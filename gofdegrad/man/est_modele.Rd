@@ -2,20 +2,20 @@
 % Please edit documentation in R/dispatchers.R
 \name{est_modele}
 \alias{est_modele}
-\title{Fermeture d'estimation liee a un modele}
+\title{Estimation closure bound to a model}
 \usage{
 est_modele(modele)
 }
 \arguments{
-\item{modele}{Chaine de caracteres : \code{"Wiener"}, \code{"Gamma"},
-\code{"IG"}, \code{"Wiener_nonhomog"} ou \code{"Gamma_nonhomog"}.}
+\item{modele}{Character string: \code{"Wiener"}, \code{"Gamma"},
+\code{"IG"}, \code{"Wiener_nonhomog"} or \code{"Gamma_nonhomog"}.}
 }
 \value{
-Une fonction \code{function(X, T) -> theta}.
+A function \code{function(X, T) -> theta}.
 }
 \description{
-Construit une fonction d'estimation \code{function(X, T)} liee a un nom
-de modele, utilisable directement comme argument \code{est} de
+Builds an estimation function \code{function(X, T)} bound to a model
+name, usable directly as the \code{est} argument of
 \code{\link{test_gof}}.
 }
 \examples{
