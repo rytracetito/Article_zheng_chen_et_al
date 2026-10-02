@@ -2,32 +2,32 @@
 % Please edit documentation in R/algorithme3-simulateurs-trajectoire.R
 \name{sim_traj}
 \alias{sim_traj}
-\title{Simulation de trajectoires sous un modele a trajectoire generale}
+\title{Simulate trajectories under a general path model}
 \usage{
 sim_traj(T, th, mod, mp, gen_phi)
 }
 \arguments{
-\item{T}{Vecteur numerique des \code{n} instants d'observation.}
+\item{T}{Numeric vector of the \code{n} observation times.}
 
-\item{th}{Liste \code{list(omega, s_eps)} : effets fixes et ecart-type de
-l'erreur de mesure. \code{omega} n'est utilise que pour le modele
-\code{"exponentiel"}.}
+\item{th}{List \code{list(omega, s_eps)}: fixed effect and residual
+standard deviation. \code{omega} is only used for the
+\code{"exponentiel"} model.}
 
-\item{mod}{Chaine de caracteres : \code{"lineaire"}, \code{"loi_puissance"}
-ou \code{"exponentiel"}.}
+\item{mod}{Character string: \code{"lineaire"}, \code{"loi_puissance"}
+or \code{"exponentiel"}.}
 
-\item{mp}{Nombre entier de trajectoires \eqn{m'} a simuler.}
+\item{mp}{Integer number of trajectories \eqn{m'} to simulate.}
 
-\item{gen_phi}{Fonction de tirage des effets aleatoires \eqn{\phi_k},
-typiquement produite par \code{\link{gen_phi_norm}}.}
+\item{gen_phi}{Sampling function for the random effects \eqn{\phi_k},
+typically produced by \code{\link{gen_phi_norm}}.}
 }
 \value{
-Matrice numerique \eqn{m' \times n} des trajectoires simulees.
+Numeric \eqn{m' \times n} matrix of simulated trajectories.
 }
 \description{
-Genere \code{mp} trajectoires de degradation simulees sous un modele a
-trajectoire generale (lineaire, loi de puissance ou exponentiel),
-Algorithme 3 de Zheng, Wang, Chen & Xie (2026).
+Generates \code{mp} simulated degradation trajectories under a general
+path model (linear, power law or exponential), Algorithm 3 of
+Zheng, Wang, Chen & Xie (2026).
 }
 \examples{
 T <- 1:50
