@@ -59,12 +59,12 @@ etude_puissance(h = 1000, gen_H0, T, est_modele("Wiener"), sim_modele("Wiener"),
 
 ## Structure
 
-- `R/algorithme1-test-gof.R` — Algorithme 1 : distances, statistiques, test complet
-- `R/algorithme2-simulateurs-processus.R` — Algorithme 2 : Wiener/Gamma/IG
-- `R/algorithme3-simulateurs-trajectoire.R` — Algorithme 3 : lineaire/loi de puissance/exponentiel
-- `R/estimateurs.R` — estimateurs MLE, un par modele, plus le dispatcher `estimer_parametres()`
-- `R/dispatchers.R` — `sim_modele()` / `est_modele()`, fermetures generiques pour `test_gof()`
-- `R/etude-puissance.R` — etude de niveau/puissance par repetition
+- `R/algorithme1-test-gof.R` : Algorithme 1 (distances, statistiques, test complet)
+- `R/algorithme2-simulateurs-processus.R` : Algorithme 2 (Wiener, Gamma, IG)
+- `R/algorithme3-simulateurs-trajectoire.R` : Algorithme 3 (lineaire, loi de puissance, exponentiel)
+- `R/estimateurs.R` : estimateurs MLE, un par modele, plus le dispatcher `estimer_parametres()`
+- `R/dispatchers.R` : `sim_modele()` et `est_modele()`, fermetures generiques pour `test_gof()`
+- `R/etude-puissance.R` : etude de niveau et de puissance par repetition
 
 ## Limites connues
 
