@@ -4,32 +4,136 @@
 \name{gofdegrad-package}
 \alias{gofdegrad}
 \alias{gofdegrad-package}
-\title{gofdegrad : Tests d'adequation pour processus de degradation}
+\title{gofdegrad: goodness-of-fit tests for degradation models}
 \description{
-Implementation du test d'adequation par similarite de trajectoires et
-bootstrap parametrique de Zheng, Wang, Chen & Xie (2026, Quality and
-Reliability Engineering International, \doi{10.1002/qre.70382}).
+\code{gofdegrad} implements the goodness-of-fit test for degradation models of
+Zheng, Wang, Chen and Xie (2026). Is a gamma process, a Wiener process or
+another model adequate for a set of degradation trajectories? The test
+compares the observed trajectories with trajectories simulated under the
+fitted model, through similarity measures, and calibrates the decision by
+parametric bootstrap. It applies to trajectories inspected at the same,
+possibly irregular, times.
 }
-\section{Modeles disponibles}{
+\section{Functions of the package}{
 
-\describe{
-  \item{\code{"Wiener"}}{Wiener homogene}
-  \item{\code{"Gamma"}}{Gamma homogene}
-  \item{\code{"IG"}}{Inverse Gaussien homogene}
-  \item{\code{"Wiener_nonhomog"}}{Wiener non-homogene, \eqn{\Lambda(t) = t^r}}
-  \item{\code{"Gamma_nonhomog"}}{Gamma non-homogene, \eqn{\Lambda(t) = t^r}}
-}
-}
-
-\section{Point d'entree typique}{
-
-\code{\link{sim_proc}} / \code{\link{sim_traj}} pour simuler,
-\code{\link{estimer_parametres}} pour estimer, \code{\link{test_gof}}
-pour tester, \code{\link{etude_puissance}} pour le niveau/la puissance.
+Test (click on a function name for its help page):\tabular{ll}{
+   Function \tab Purpose \cr
+   \code{\link[=gof_test]{gof_test()}} \tab goodness-of-fit test of one candidate model \cr
+   \code{\link[=compare_models]{compare_models()}} \tab tests of several candidate models on the same data \cr
+   \code{\link[=power_study]{power_study()}} \tab empirical level or power of the test \cr
 }
 
+
+Models and data:\tabular{ll}{
+   Function \tab Purpose \cr
+   \code{\link[=gof_models]{gof_models()}} \tab the seven available candidate models \cr
+   \code{\link[=fit_model]{fit_model()}} \tab maximum likelihood estimation of a candidate model \cr
+   \code{\link[=sim_model]{sim_model()}} \tab simulation of a candidate model \cr
+   \code{\link[=sim_path]{sim_path()}} \tab simulation of general path models \cr
+   \code{\link[=custom_model]{custom_model()}} \tab any other candidate model, from its own functions \cr
+   \code{\link[=gof_data]{gof_data()}} \tab conversion and check of the data \cr
+   \code{\link[=similarity_stats]{similarity_stats()}} \tab the four similarity statistics \cr
+}
+
+
+The result of \code{\link[=gof_test]{gof_test()}} is printed as a table, converted to a data
+frame by \link[=as.data.frame.gof_test]{as.data.frame()} and plotted by
+\link[=plot.gof_test]{plot()}.
+}
+
+\section{Candidate models}{
+\tabular{lll}{
+   Model \tab Process \tab Parameters \cr
+   \code{"wiener"} \tab Wiener with drift \tab \code{mu}, \code{sigma} \cr
+   \code{"gamma"} \tab gamma \tab shape \code{a}, rate \code{b} \cr
+   \code{"ig"} \tab inverse Gaussian \tab \code{mu}, \code{eta} \cr
+   \code{"vg"} \tab variance-gamma \tab \code{theta}, \code{sigma}, \code{nu} \cr
+   \code{"meixner"} \tab Meixner \tab \code{a}, \code{b}, \code{d}, \code{m} \cr
+   \code{"wiener_power"} \tab Wiener, trend \eqn{\mu t^r} \tab \code{mu}, \code{sigma}, \code{r} \cr
+   \code{"gamma_power"} \tab gamma, shape function \eqn{a t^r} \tab \code{a}, \code{b}, \code{r} \cr
+}
+
+
+The first five are Lévy processes, estimated with the package \code{levyfit}
+and simulated with the package \code{levysim}; \code{\link[=gof_models]{gof_models()}} gives the law
+of their increments. Any other model, for instance a general path model,
+can be tested with \code{\link[=custom_model]{custom_model()}}.
+}
+
+\section{Getting started}{
+
+A test always follows the same three steps.
+\enumerate{
+\item \strong{Prepare the data}: all the trajectories must be inspected at the
+same times. Simulated data from \code{levysim} or \code{\link[=sim_model]{sim_model()}} can be used
+directly; real data can be given as a data frame with the columns
+\code{id} (trajectory), \code{t} (time) and \code{X} (degradation level), or as a
+matrix with one row per trajectory and the times in \code{t} (see
+\code{\link[=gof_data]{gof_data()}}). The degradation is measured from time 0.
+\item \strong{Test} each candidate model with \code{\link[=gof_test]{gof_test()}}, or several at once
+with \code{\link[=compare_models]{compare_models()}}, after \code{set.seed()} for reproducible results.
+Use a small number of bootstrap samples \code{B} to explore, then
+\code{B = 1000}.
+\item \strong{Read the result}: the p-values and decisions of the four statistics,
+with \link[=plot.gof_test]{plot()} for the bootstrap distributions. A
+non-rejection with few trajectories or few inspections only means that
+the data are compatible with the model: check the power with
+\code{\link[=power_study]{power_study()}}.
+}
+}
+
+\section{The test in brief}{
+
+Let \eqn{X_1, \dots, X_m} be the observed trajectories, inspected at the
+times \eqn{t_1 < \dots < t_n}. The parameters of the candidate model are
+estimated by maximum likelihood, and \eqn{m'} trajectories are simulated
+under the fitted model (the pool, \eqn{m' = 100m} by default). Each
+observed trajectory is matched with the closest trajectory of the pool,
+for the distance \eqn{\max_j |x_j - y_j|} (KS type) or
+\eqn{\sum_j (x_j - y_j)^2} (CvM type), and these smallest distances are
+summarized by their maximum (\code{sup}) or their sum (\code{sum}): four statistics.
+Their distribution under the null hypothesis is obtained by parametric
+bootstrap, the parameters being estimated again on each bootstrap sample.
+See \code{\link[=gof_test]{gof_test()}} for the details.
+}
+
+\examples{
+# 1. Data: six trajectories of a gamma process, inspected every time unit
+set.seed(1)
+x <- sim_model(0:30, "gamma", c(a = 2, b = 3), n_traj = 6)
+levysim::plot_traj(x)
+
+# 2. Test of the gamma model (small B to keep the example fast)
+res <- gof_test(x, "gamma", B = 100, n_pool = 300)
+res
+plot(res)
+
+# 3. Several candidate models at once
+compare_models(x, c("gamma", "ig", "wiener"), B = 50, n_pool = 300, seed = 1)
+}
+\references{
+Zheng, J., Wang, Y., Chen, Y. and Xie, M. (2026). Automated verification
+of degradation models using goodness-of-fit test based on similarity
+measures and parametric bootstrap. \emph{Quality and Reliability Engineering
+International}. \doi{10.1002/qre.70382}
+
+Ye, Z.-S. and Xie, M. (2015). Stochastic modelling and analysis of
+degradation for highly reliable products. \emph{Applied Stochastic Models in
+Business and Industry}, 31(1), 16-32. \doi{10.1002/asmb.2063}
+
+Meeker, W. Q., Escobar, L. A. and Pascual, F. G. (2021). \emph{Statistical
+Methods for Reliability Data}, 2nd edition. Wiley.
+}
+\seealso{
+Useful links:
+\itemize{
+\item \url{https://github.com/rytracetito/Article_zheng_chen_et_al}
+\item Report bugs at \url{https://github.com/rytracetito/Article_zheng_chen_et_al/issues}
+\item The packages \code{levysim} (simulation) and \code{levyfit} (estimation):
+\url{https://github.com/rytracetito/levy_packages}
+}
+}
 \author{
-\strong{Maintainer}: Rytrace Tito \email{tito.amedee-rytrace@univ-pau.fr} [copyright holder]
+\strong{Maintainer}: Amedée Rytrace Tito \email{tito.amedee-rytrace@univ-pau.fr} [copyright holder]
 
 }
-\keyword{internal}

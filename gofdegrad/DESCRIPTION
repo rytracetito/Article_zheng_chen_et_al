@@ -1,22 +1,39 @@
 Package: gofdegrad
-Type: Package
-Title: Goodness-of-Fit Tests for Degradation Processes
-Version: 0.2.0
-Authors@R: person("Rytrace", "Tito", email = "tito.amedee-rytrace@univ-pau.fr", role = c("aut", "cre", "cph"))
-Description: Implementation of the goodness-of-fit testing method by similarity
-    measures and parametric bootstrap of Zheng, Wang, Chen & Xie (2026,
-    Quality and Reliability Engineering International). Supports Wiener,
-    Gamma and Inverse Gaussian stochastic process degradation models
-    (homogeneous and non-homogeneous), and general path degradation models
-    (linear, power law, exponential).
+Title: Goodness-of-Fit Tests for Degradation Models by Similarity and Bootstrap
+Version: 1.0.0
+Authors@R:
+    person("Amedée Rytrace", "Tito", , "tito.amedee-rytrace@univ-pau.fr", role = c("aut", "cre", "cph"))
+Description: Goodness-of-fit test for degradation models of Zheng, Wang,
+    Chen and Xie (2026, Quality and Reliability Engineering International):
+    the observed trajectories are compared with trajectories simulated under
+    the fitted candidate model through Kolmogorov-Smirnov and Cramer-von Mises
+    type similarity measures, and the critical values are obtained by
+    parametric bootstrap. Seven candidate models are available (Wiener, gamma,
+    inverse Gaussian, variance-gamma and Meixner processes, and Wiener and
+    gamma processes with power-law time transformation), with possibly
+    irregular inspection times common to all trajectories; any other model can
+    be tested by giving its own estimation and simulation functions. The
+    simulations rely on the package 'levysim' and the maximum likelihood
+    estimators on the package 'levyfit'. Level and power studies by Monte
+    Carlo simulation are also provided.
 License: MIT + file LICENSE
 URL: https://github.com/rytracetito/Article_zheng_chen_et_al
 BugReports: https://github.com/rytracetito/Article_zheng_chen_et_al/issues
 Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports:
+    ggplot2,
+    levyfit,
+    levysim,
+    Runuran,
     stats,
-    statmod
+    utils
 Suggests:
+    SMRD.data,
     testthat (>= 3.0.0)
+Remotes:
+    github::rytracetito/levy_packages/levysim,
+    github::rytracetito/levy_packages/levyfit,
+    github::Auburngrads/SMRD.data
 Config/testthat/edition: 3

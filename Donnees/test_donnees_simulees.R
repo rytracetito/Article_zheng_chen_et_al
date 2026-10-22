@@ -1,12 +1,11 @@
 library(gofdegrad)
 library(ggplot2)
 
-dossier <- "C:/Users/ADMIN/Desktop/Ma Thèse/Thèse_1/Code_R/article_zheng_chen/Donnees"
+dossier <- "C:/Users/ADMIN/Desktop/Ma Thèse/Thèse_1/Recherche_1/article_zheng_chen/Donnees"
 d <- read.csv(file.path(dossier, "degradation_simulee_20traj.csv"))
 
-T <- sort(unique(d$temps))
-X <- t(sapply(split(d, d$trajectoire), function(s) s$degradation[order(s$temps)]))
-dim(X)
+donnees <- data.frame(id = d$trajectoire, t = d$temps, X = d$degradation)
+gof_data(donnees)
 
 L <- 1000
 
@@ -19,23 +18,7 @@ fig <- ggplot(d, aes(temps, degradation, group = trajectoire)) +
         plot.title = element_text(face = "bold"))
 print(fig)
 
-modeles <- c("Wiener", "Gamma", "IG", "Wiener_nonhomog", "Gamma_nonhomog")
+modeles <- c("wiener", "gamma", "ig", "wiener_power", "gamma_power")
 
-estimations <- lapply(modeles, function(mod)
-  tryCatch(estimer_parametres(X, T, mod), error = function(e) conditionMessage(e)))
-names(estimations) <- modeles
-estimations
-
-resultats <- list()
-for (mod in modeles) {
-  set.seed(30)
-  resultats[[mod]] <- tryCatch(
-    test_gof(X, T, est_modele(mod), sim_modele(mod), mp = 100 * nrow(X), L = L),
-    error = function(e) NULL)
-}
-
-testes <- Filter(Negate(is.null), resultats)
-setdiff(modeles, names(testes))
-
-round(t(sapply(testes, `[[`, "p_valeur")), 3)
-t(sapply(testes, `[[`, "rejet"))
+resultats <- compare_models(donnees, modeles, B = L, seed = 30)
+resultats
