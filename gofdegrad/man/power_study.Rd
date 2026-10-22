@@ -94,6 +94,25 @@ power_study(function() sim_path(t, "linear", phi_mean = 0.2, phi_sd = 0.05,
 #    by default, or excluded
 gen <- function() sim_model(t, "wiener", c(mu = 0.5, sigma = 0.5), n_traj = 6)
 power_study(gen, model = "gamma", n_rep = 10, B = 30, n_pool = 150)
+
+# 5. Wiener data with a strong drift: some data sets have only positive
+#    increments and can be fitted by the gamma model; with
+#    failure = "exclude", the rate is the power of the test on them only
+gen <- function() sim_model(t, "wiener", c(mu = 2, sigma = 0.5), n_traj = 2)
+p <- power_study(gen, model = "gamma", n_rep = 10, B = 30, n_pool = 150,
+                 failure = "exclude")
+p
+
+# 6. The elements of the result
+p$rate
+p$se
+p$n_failed
+head(p$rejections)
+
+# 7. Level with irregular inspection times and a progress bar
+t_irr <- levysim::inspection_times("dec-inc", n = 15, tmax = 20)$time
+power_study(function() sim_model(t_irr, "ig", c(mu = 0.5, eta = 2), n_traj = 4),
+            model = "ig", n_rep = 10, B = 30, n_pool = 150, progress = TRUE)
 }
 \references{
 Zheng, J., Wang, Y., Chen, Y. and Xie, M. (2026). Automated verification

@@ -19,10 +19,34 @@ A data frame with one row per statistic and the columns \code{stat}
 \code{"not rejected"}).
 }
 \description{
-Results of a goodness-of-fit test as a data frame
+Converts the result of \code{\link[=gof_test]{gof_test()}} into a data frame with one row per
+statistic: the observed value, the critical value, the p-value and the
+decision. This is the table printed by \code{\link[=gof_test]{gof_test()}}; as a data frame, it
+can be rounded, saved in a csv file, or gathered with the results of other
+tests (see also \code{\link[=compare_models]{compare_models()}}).
 }
 \examples{
+# 1. One test as a data frame
 set.seed(1)
 x <- sim_model(0:20, "wiener", c(mu = 1, sigma = 0.5), n_traj = 5)
-as.data.frame(gof_test(x, "wiener", B = 50, n_pool = 200))
+res <- gof_test(x, "wiener", B = 50, n_pool = 200)
+tab <- as.data.frame(res)
+tab
+
+# 2. Rounded values, for a report
+tab$statistic <- round(tab$statistic, 3)
+tab$critical <- round(tab$critical, 3)
+tab
+
+# 3. Several tests gathered in one data frame, with the name of the model
+res_wp <- gof_test(x, "wiener_power", B = 50, n_pool = 200)
+rbind(cbind(model = "wiener", as.data.frame(res)),
+      cbind(model = "wiener_power", as.data.frame(res_wp)))
+
+# 4. Save the table in a csv file
+f <- tempfile(fileext = ".csv")
+write.csv(tab, f, row.names = FALSE)
+}
+\seealso{
+\code{\link[=gof_test]{gof_test()}}, \code{\link[=compare_models]{compare_models()}}
 }

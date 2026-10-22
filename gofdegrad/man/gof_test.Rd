@@ -150,8 +150,22 @@ gof_test(x, "ig", B = 100, n_pool = 400)
 X <- gof_data(x)$X
 gof_test(X, "ig", t = gof_data(x)$t, B = 50, n_pool = 400)
 
+# 7. Gamma process with power-law shape function
+x <- sim_model(1:25, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 6)
+gof_test(x, "gamma_power", B = 30, n_pool = 300)
+
+# 8. A progress bar for long tests
+res <- gof_test(x, "gamma", B = 30, n_pool = 300, progress = TRUE)
+
 \donttest{
-# 7. Real data: GaAs laser (package SMRD.data); the homogeneous Wiener
+# 9. Variance-gamma and Meixner models (slower estimation)
+x <- sim_model(0:40, "vg", c(theta = 0.5, sigma = 1, nu = 0.5), n_traj = 6)
+gof_test(x, "vg", B = 100)
+gof_test(x, "wiener", B = 100)
+y <- sim_model(0:100, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 6)
+gof_test(y, "meixner", B = 50)
+
+# 10. Real data: GaAs laser (package SMRD.data); the homogeneous Wiener
 #    model is rejected, as in Zheng et al. (2026)
 if (requireNamespace("SMRD.data", quietly = TRUE)) {
   laser <- SMRD.data::gaaslaser

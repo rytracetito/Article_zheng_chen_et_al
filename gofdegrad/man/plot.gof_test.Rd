@@ -22,11 +22,26 @@ statistics with the observed value (solid line) and the critical value
 to the right of the dashed line.
 }
 \examples{
+# 1. H0 true: the observed values (solid lines) stay within the
+#    bootstrap distributions, left of the critical values (dashed lines)
 set.seed(1)
 x <- sim_model(0:20, "gamma", c(a = 2, b = 3), n_traj = 5)
 res <- gof_test(x, "gamma", B = 100, n_pool = 250)
 plot(res)
 
-# Change the title
-plot(res) + ggplot2::labs(title = "Gamma model, bootstrap distributions")
+# 2. H0 false: concave paths tested against the homogeneous Wiener model;
+#    the observed values are far to the right of the critical values
+y <- sim_model(1:20, "wiener_power", c(mu = 2, sigma = 0.2, r = 0.4), n_traj = 5)
+plot(gof_test(y, "wiener", B = 100, n_pool = 250))
+
+# 3. Change the title and the axis labels
+plot(res) + ggplot2::labs(title = "Gamma model, bootstrap distributions",
+                          x = "Value of the statistic")
+
+# 4. Save the plot
+f <- tempfile(fileext = ".pdf")
+ggplot2::ggsave(f, plot(res), width = 8, height = 5)
+}
+\seealso{
+\code{\link[=gof_test]{gof_test()}}
 }

@@ -135,8 +135,22 @@
 #' X <- gof_data(x)$X
 #' gof_test(X, "ig", t = gof_data(x)$t, B = 50, n_pool = 400)
 #'
+#' # 7. Gamma process with power-law shape function
+#' x <- sim_model(1:25, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 6)
+#' gof_test(x, "gamma_power", B = 30, n_pool = 300)
+#'
+#' # 8. A progress bar for long tests
+#' res <- gof_test(x, "gamma", B = 30, n_pool = 300, progress = TRUE)
+#'
 #' \donttest{
-#' # 7. Real data: GaAs laser (package SMRD.data); the homogeneous Wiener
+#' # 9. Variance-gamma and Meixner models (slower estimation)
+#' x <- sim_model(0:40, "vg", c(theta = 0.5, sigma = 1, nu = 0.5), n_traj = 6)
+#' gof_test(x, "vg", B = 100)
+#' gof_test(x, "wiener", B = 100)
+#' y <- sim_model(0:100, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 6)
+#' gof_test(y, "meixner", B = 50)
+#'
+#' # 10. Real data: GaAs laser (package SMRD.data); the homogeneous Wiener
 #' #    model is rejected, as in Zheng et al. (2026)
 #' if (requireNamespace("SMRD.data", quietly = TRUE)) {
 #'   laser <- SMRD.data::gaaslaser
@@ -213,6 +227,13 @@ print.gof_test <- function(x, digits = 4, ...) {
 
 #' Results of a goodness-of-fit test as a data frame
 #'
+#' @description
+#' Converts the result of [gof_test()] into a data frame with one row per
+#' statistic: the observed value, the critical value, the p-value and the
+#' decision. This is the table printed by [gof_test()]; as a data frame, it
+#' can be rounded, saved in a csv file, or gathered with the results of other
+#' tests (see also [compare_models()]).
+#'
 #' @param x Result of [gof_test()].
 #' @param row.names,optional,... Not used, for compatibility with the generic
 #'   function.
@@ -222,10 +243,29 @@ print.gof_test <- function(x, digits = 4, ...) {
 #'   (critical value), `p.value` and `decision` (`"rejected"` or
 #'   `"not rejected"`).
 #'
+#' @seealso [gof_test()], [compare_models()]
+#'
 #' @examples
+#' # 1. One test as a data frame
 #' set.seed(1)
 #' x <- sim_model(0:20, "wiener", c(mu = 1, sigma = 0.5), n_traj = 5)
-#' as.data.frame(gof_test(x, "wiener", B = 50, n_pool = 200))
+#' res <- gof_test(x, "wiener", B = 50, n_pool = 200)
+#' tab <- as.data.frame(res)
+#' tab
+#'
+#' # 2. Rounded values, for a report
+#' tab$statistic <- round(tab$statistic, 3)
+#' tab$critical <- round(tab$critical, 3)
+#' tab
+#'
+#' # 3. Several tests gathered in one data frame, with the name of the model
+#' res_wp <- gof_test(x, "wiener_power", B = 50, n_pool = 200)
+#' rbind(cbind(model = "wiener", as.data.frame(res)),
+#'       cbind(model = "wiener_power", as.data.frame(res_wp)))
+#'
+#' # 4. Save the table in a csv file
+#' f <- tempfile(fileext = ".csv")
+#' write.csv(tab, f, row.names = FALSE)
 #' @export
 as.data.frame.gof_test <- function(x, row.names = NULL, optional = FALSE, ...) {
   data.frame(
@@ -252,14 +292,28 @@ as.data.frame.gof_test <- function(x, row.names = NULL, optional = FALSE, ...) {
 #' @return A `ggplot` object, which can be modified with the usual
 #'   `ggplot2` functions.
 #'
+#' @seealso [gof_test()]
+#'
 #' @examples
+#' # 1. H0 true: the observed values (solid lines) stay within the
+#' #    bootstrap distributions, left of the critical values (dashed lines)
 #' set.seed(1)
 #' x <- sim_model(0:20, "gamma", c(a = 2, b = 3), n_traj = 5)
 #' res <- gof_test(x, "gamma", B = 100, n_pool = 250)
 #' plot(res)
 #'
-#' # Change the title
-#' plot(res) + ggplot2::labs(title = "Gamma model, bootstrap distributions")
+#' # 2. H0 false: concave paths tested against the homogeneous Wiener model;
+#' #    the observed values are far to the right of the critical values
+#' y <- sim_model(1:20, "wiener_power", c(mu = 2, sigma = 0.2, r = 0.4), n_traj = 5)
+#' plot(gof_test(y, "wiener", B = 100, n_pool = 250))
+#'
+#' # 3. Change the title and the axis labels
+#' plot(res) + ggplot2::labs(title = "Gamma model, bootstrap distributions",
+#'                           x = "Value of the statistic")
+#'
+#' # 4. Save the plot
+#' f <- tempfile(fileext = ".pdf")
+#' ggplot2::ggsave(f, plot(res), width = 8, height = 5)
 #' @export
 plot.gof_test <- function(x, ...) {
   stats_names <- colnames(x$boot)
@@ -316,6 +370,31 @@ plot.gof_test <- function(x, ...) {
 #' # Data with negative increments: the increasing models are not testable
 #' y <- sim_model(0:30, "wiener", c(mu = 0.5, sigma = 1), n_traj = 6)
 #' compare_models(y, c("wiener", "gamma"), B = 50, n_pool = 300, seed = 1)
+#'
+#' # Models still accepted by the four statistics
+#' res$model[which(res$rejections == 0)]
+#'
+#' # A built-in model and a custom model in the same comparison
+#' drift <- custom_model("Wiener with known drift 0.5", "sigma",
+#'   fit = function(X, t) {
+#'     dX <- X - cbind(0, X[, -ncol(X), drop = FALSE])
+#'     dt <- matrix(diff(c(0, t)), nrow(X), length(t), byrow = TRUE)
+#'     c(sigma = sqrt(mean((dX - 0.5 * dt)^2 / dt)))
+#'   },
+#'   simulate = function(theta, t, n) {
+#'     gof_data(sim_model(t, "wiener", c(mu = 0.5, sigma = theta[["sigma"]]), n_traj = n))$X
+#'   })
+#' compare_models(y, list("wiener", drift), B = 50, n_pool = 300, seed = 1)
+#'
+#' \donttest{
+#' # Real data: GaAs laser (package SMRD.data), five candidate models
+#' if (requireNamespace("SMRD.data", quietly = TRUE)) {
+#'   laser <- SMRD.data::gaaslaser
+#'   laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
+#'   compare_models(laser, c("wiener", "gamma", "ig", "wiener_power", "gamma_power"),
+#'                  B = 200, seed = 30)
+#' }
+#' }
 #' @export
 compare_models <- function(x, models = gof_models()$model, t = NULL, B = 1000, n_pool = NULL,
                            alpha = 0.05, seed = NULL) {

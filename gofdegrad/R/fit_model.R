@@ -288,6 +288,32 @@ as_levysim <- function(X, t, model, parameters) {
 #'
 #' # The same data tested against a Wiener process
 #' gof_test(x, "wiener", B = 50, n_pool = 200)
+#'
+#' # A Wiener process whose trend and variance follow different time scales,
+#' # X(t) = mu t^0.5 + sigma B(t^0.25), which is not among the built-in
+#' # models: given the two time functions, the estimators are explicit
+#' Lambda <- function(t) t^0.5
+#' tau <- function(t) t^0.25
+#' wiener_tt <- custom_model(
+#'   name = "Wiener, trend t^0.5, variance t^0.25",
+#'   parameters = c("mu", "sigma"),
+#'   fit = function(X, t) {
+#'     dX <- X - cbind(0, X[, -ncol(X), drop = FALSE])
+#'     dL <- matrix(diff(Lambda(c(0, t))), nrow(X), length(t), byrow = TRUE)
+#'     dT <- matrix(diff(tau(c(0, t))), nrow(X), length(t), byrow = TRUE)
+#'     mu <- sum(dX * dL / dT) / sum(dL^2 / dT)
+#'     c(mu = mu, sigma = sqrt(mean((dX - mu * dL)^2 / dT)))
+#'   },
+#'   simulate = function(theta, t, n) {
+#'     x <- levysim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]],
+#'                              Lambda = Lambda, tau = tau, n_traj = n)
+#'     gof_data(x)$X
+#'   }
+#' )
+#' t <- levysim::inspection_times("increasing", n = 29, tmax = 35, digits = 2)$time
+#' y <- sim_model(t, wiener_tt, c(mu = 2, sigma = 0.78), n_traj = 6)
+#' fit_model(y, wiener_tt)
+#' gof_test(y, wiener_tt, B = 50, n_pool = 300)
 #' @export
 custom_model <- function(name, parameters, fit, simulate, increasing = FALSE) {
   if (!is.character(name) || length(name) != 1) stop("name must be a character string")

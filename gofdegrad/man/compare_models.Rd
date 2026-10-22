@@ -68,6 +68,31 @@ attr(res, "tests")$ig
 # Data with negative increments: the increasing models are not testable
 y <- sim_model(0:30, "wiener", c(mu = 0.5, sigma = 1), n_traj = 6)
 compare_models(y, c("wiener", "gamma"), B = 50, n_pool = 300, seed = 1)
+
+# Models still accepted by the four statistics
+res$model[which(res$rejections == 0)]
+
+# A built-in model and a custom model in the same comparison
+drift <- custom_model("Wiener with known drift 0.5", "sigma",
+  fit = function(X, t) {
+    dX <- X - cbind(0, X[, -ncol(X), drop = FALSE])
+    dt <- matrix(diff(c(0, t)), nrow(X), length(t), byrow = TRUE)
+    c(sigma = sqrt(mean((dX - 0.5 * dt)^2 / dt)))
+  },
+  simulate = function(theta, t, n) {
+    gof_data(sim_model(t, "wiener", c(mu = 0.5, sigma = theta[["sigma"]]), n_traj = n))$X
+  })
+compare_models(y, list("wiener", drift), B = 50, n_pool = 300, seed = 1)
+
+\donttest{
+# Real data: GaAs laser (package SMRD.data), five candidate models
+if (requireNamespace("SMRD.data", quietly = TRUE)) {
+  laser <- SMRD.data::gaaslaser
+  laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
+  compare_models(laser, c("wiener", "gamma", "ig", "wiener_power", "gamma_power"),
+                 B = 200, seed = 30)
+}
+}
 }
 \seealso{
 \code{\link[=gof_test]{gof_test()}}
