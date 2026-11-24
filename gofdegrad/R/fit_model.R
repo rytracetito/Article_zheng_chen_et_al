@@ -12,8 +12,8 @@
 #'   one row per trajectory (with `t`), data frame (`id`, `t`, `X`) or list
 #'   of data frames.
 #' @param model Name of the model, one of `"wiener"`, `"gamma"`, `"ig"`,
-#'   `"vg"`, `"meixner"`, `"wiener_power"`, `"gamma_power"`, `"ig_re"` (see
-#'   [gof_models()]), or a model built with [custom_model()].
+#'   `"vg"`, `"meixner"`, `"wiener_power"`, `"wiener_exp"`, `"gamma_power"`,
+#'   `"ig_re"` (see [gof_models()]), or a model built with [custom_model()].
 #' @param t Inspection times, only when `x` is a matrix with one row per
 #'   trajectory or a vector (see [gof_data()]).
 #'
@@ -28,21 +28,29 @@
 #' * variance-gamma: EM algorithm then quasi-Newton, [levyfit::vg_mle()];
 #' * Meixner: profile likelihood, [levyfit::meixner_mle()].
 #'
-#' For the two power-law models, the likelihood is profiled in \eqn{r}:
-#' * `"wiener_power"`: for a given \eqn{r}, with
-#'   \eqn{\Delta\Lambda_j = t_j^r - t_{j-1}^r}, the estimators are explicit,
-#'   \deqn{\hat\mu(r) = \frac{\sum_j (\Delta\Lambda_j/\Delta t_j) S_j}{m \sum_j \Delta\Lambda_j^2/\Delta t_j},
-#'   \qquad \hat\sigma^2(r) = \frac{1}{mn}\sum_{i,j}\frac{(\Delta x_{ij} - \hat\mu(r)\Delta\Lambda_j)^2}{\Delta t_j},}
+#' For the three models with a transformed trend, the likelihood is profiled
+#' in the parameter of the trend:
+#' * `"wiener_power"` and `"wiener_exp"`: for a given trend parameter, with
+#'   \eqn{\Delta\Lambda_j = \Lambda(t_j) - \Lambda(t_{j-1})}, where
+#'   \eqn{\Lambda(t) = t^r} or \eqn{\Lambda(t) = e^{\lambda t} - 1}, the
+#'   estimators are explicit,
+#'   \deqn{\hat\mu = \frac{\sum_j (\Delta\Lambda_j/\Delta t_j) S_j}{m \sum_j \Delta\Lambda_j^2/\Delta t_j},
+#'   \qquad \hat\sigma^2 = \frac{1}{mn}\sum_{i,j}\frac{(\Delta x_{ij} - \hat\mu\Delta\Lambda_j)^2}{\Delta t_j},}
 #'   where \eqn{S_j} is the sum of the increments of the \eqn{j}-th
-#'   interval; the profile likelihood is maximal where \eqn{\hat\sigma^2(r)}
+#'   interval; the profile likelihood is maximal where \eqn{\hat\sigma^2}
 #'   is minimal;
 #' * `"gamma_power"`: for a given \eqn{r}, the process is a homogeneous gamma
 #'   process in the time \eqn{t^r}, estimated by [levyfit::gamma_mle()].
 #'
-#' \eqn{r} is searched by [stats::optimize()] in \eqn{[0.01, 20]}, on the
-#' time scale \eqn{t/t_n} for numerical stability; a warning is given when
-#' the estimate is at a boundary of this interval (for instance with a
-#' single trajectory, whose trend is poorly identified).
+#' The trend parameter is searched by [stats::optimize()] on the time scale
+#' \eqn{u = t/t_n}, for numerical stability: \eqn{r} in \eqn{[0.01, 20]} and
+#' \eqn{\lambda t_n} in \eqn{[0.001, 50]}. A warning is given when the
+#' estimate is at a boundary of this interval (for instance with a single
+#' trajectory, whose trend is poorly identified, or with an almost linear
+#' trend for `"wiener_exp"`). In `"wiener_exp"`, \eqn{\mu} and \eqn{\lambda}
+#' are strongly correlated: with few trajectories \eqn{\hat\mu} is variable,
+#' while the mean path \eqn{\hat\mu (e^{\hat\lambda t} - 1)} is well
+#' estimated.
 #'
 #' For the random-effects model `"ig_re"` (model \eqn{M_3} of Peng, 2015), the rates
 #' \eqn{\delta_i} of the units are integrated out: the likelihood of the
@@ -111,6 +119,10 @@
 #' # 4. Gamma process with power-law shape function
 #' x <- sim_model(0:40, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 10)
 #' fit_model(x, "gamma_power")
+#'
+#' # Wiener process with exponential trend mu (exp(lambda t) - 1)
+#' x <- sim_model(0:50, "wiener_exp", c(mu = 0.5, sigma = 0.3, lambda = 0.05), n_traj = 30)
+#' fit_model(x, "wiener_exp")
 #'
 #' # 5. Inverse Gaussian process with random drift: each unit has its own
 #' #    rate 1/delta_i, with delta_i ~ N(xi, sd_delta^2)
@@ -182,10 +194,11 @@ check_estimate <- function(est, mod) {
 #' * Wiener, gamma, inverse Gaussian and variance-gamma: package `DegradSim`;
 #'   the power-law gamma model is the gamma process time-scaled by
 #'   \eqn{A(t) = a t^r}, also simulated by [DegradSim::sim_gamma()].
-#' * Power-law Wiener: Gaussian increments of mean
-#'   \eqn{\mu (t_j^r - t_{j-1}^r)} and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
-#'   It is not the time-scaled Wiener process \eqn{Y_{A(t)}} of `DegradSim`,
-#'   whose time scale changes both the mean and the variance.
+#' * Power-law and exponential-trend Wiener: Gaussian increments of mean
+#'   \eqn{\mu (\Lambda(t_j) - \Lambda(t_{j-1}))}, with \eqn{\Lambda(t) = t^r}
+#'   or \eqn{e^{\lambda t} - 1}, and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
+#'   They are not the time-scaled Wiener process \eqn{Y_{A(t)}} of
+#'   `DegradSim`, whose time scale changes both the mean and the variance.
 #' * Meixner: [DegradSim::sim_meixner()] draws the increments one at a time,
 #'   which is too slow for the thousands of trajectories of a bootstrap. The
 #'   Meixner increments of a same time step are therefore drawn together, with
@@ -238,6 +251,7 @@ check_estimate <- function(est, mod) {
 #' sim_model(t, "vg", c(theta = 0.5, sigma = 1, nu = 0.5), n_traj = 3)
 #' sim_model(t, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 3)
 #' sim_model(t, "wiener_power", c(mu = 1, sigma = 0.3, r = 0.5), n_traj = 3)
+#' sim_model(t, "wiener_exp", c(mu = 0.5, sigma = 0.3, lambda = 0.1), n_traj = 3)
 #' sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
 #' sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 3)
 #'

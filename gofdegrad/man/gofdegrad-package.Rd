@@ -26,7 +26,7 @@ Test (click on a function name for its help page):\tabular{ll}{
 
 Models and data:\tabular{ll}{
    Function \tab Purpose \cr
-   \code{\link[=gof_models]{gof_models()}} \tab the eight available candidate models \cr
+   \code{\link[=gof_models]{gof_models()}} \tab the nine available candidate models \cr
    \code{\link[=fit_model]{fit_model()}} \tab maximum likelihood estimation of a candidate model \cr
    \code{\link[=sim_model]{sim_model()}} \tab simulation of a candidate model \cr
    \code{\link[=sim_path]{sim_path()}} \tab simulation of general path models \cr
@@ -50,6 +50,7 @@ frame by \link[=as.data.frame.gof_test]{as.data.frame()} and plotted by
    \code{"vg"} \tab variance-gamma \tab \code{theta}, \code{sigma}, \code{nu} \cr
    \code{"meixner"} \tab Meixner \tab \code{a}, \code{b}, \code{d}, \code{m} \cr
    \code{"wiener_power"} \tab Wiener, trend \eqn{\mu t^r} \tab \code{mu}, \code{sigma}, \code{r} \cr
+   \code{"wiener_exp"} \tab Wiener, trend \eqn{\mu (e^{\lambda t} - 1)} \tab \code{mu}, \code{sigma}, \code{lambda} \cr
    \code{"gamma_power"} \tab gamma, shape function \eqn{a t^r} \tab \code{a}, \code{b}, \code{r} \cr
    \code{"ig_re"} \tab inverse Gaussian with random drift (Peng, 2015, model \eqn{M_3}) \tab \code{xi}, \code{sd_delta}, \code{eta} \cr
 }

@@ -7,27 +7,50 @@ check_r <- function(r) {
   }
 }
 
+wiener_given_trend <- function(inc, dL) {
+  m <- nrow(inc$dX)
+  n <- ncol(inc$dX)
+  dt <- inc$dt[1, ]
+  S <- colSums(inc$dX)
+  mu <- sum(dL / dt * S) / (m * sum(dL^2 / dt))
+  res <- inc$dX - matrix(mu * dL, m, n, byrow = TRUE)
+  list(mu = mu, sigma2 = sum(res^2 / inc$dt) / (m * n))
+}
+
 fit_wiener_power <- function(d) {
   inc <- increments_of(d)
-  m <- nrow(inc$dX)
   n <- ncol(inc$dX)
   if (n < 2) stop("the power-law models need at least two inspections after time 0", call. = FALSE)
   tn <- d$t[n]
   u <- c(0, d$t / tn)
-  dt <- diff(c(0, d$t))
-  S <- colSums(inc$dX)
-
-  given_r <- function(r) {
-    dL <- diff(u^r)
-    mu <- sum(dL / dt * S) / (m * sum(dL^2 / dt))
-    res <- inc$dX - matrix(mu * dL, m, n, byrow = TRUE)
-    list(mu = mu, sigma2 = sum(res^2 / inc$dt) / (m * n))
-  }
+  given_r <- function(r) wiener_given_trend(inc, diff(u^r))
   opt <- stats::optimize(function(lr) log(given_r(exp(lr))$sigma2), log(r_bounds))
   r <- exp(opt$minimum)
   check_r(r)
   g <- given_r(r)
   c(mu = g$mu / tn^r, sigma = sqrt(g$sigma2), r = r)
+}
+
+kappa_bounds <- c(1e-3, 50)
+
+fit_wiener_exp <- function(d) {
+  inc <- increments_of(d)
+  n <- ncol(inc$dX)
+  if (n < 2) stop("the exponential-trend model needs at least two inspections after time 0", call. = FALSE)
+  tn <- d$t[n]
+  u <- c(0, d$t / tn)
+  given_k <- function(k) wiener_given_trend(inc, diff(expm1(k * u)))
+  opt <- stats::optimize(function(lk) log(given_k(exp(lk))$sigma2), log(kappa_bounds))
+  k <- exp(opt$minimum)
+  if (k < kappa_bounds[1] * 1.01) {
+    warning(sprintf("the estimate of lambda (%.4g) is at the lower boundary of the search interval: ",
+                    k / tn), "the trend is almost linear", call. = FALSE)
+  } else if (k > kappa_bounds[2] / 1.01) {
+    warning(sprintf("the estimate of lambda (%.4g) is at the upper boundary of the search interval",
+                    k / tn), call. = FALSE)
+  }
+  g <- given_k(k)
+  c(mu = g$mu, sigma = sqrt(g$sigma2), lambda = k / tn)
 }
 
 fit_gamma_power <- function(d) {

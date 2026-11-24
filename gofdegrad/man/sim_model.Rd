@@ -41,10 +41,11 @@ increments at the inspection times and cumulating them.
 \item Wiener, gamma, inverse Gaussian and variance-gamma: package \code{DegradSim};
 the power-law gamma model is the gamma process time-scaled by
 \eqn{A(t) = a t^r}, also simulated by \code{\link[DegradSim:sim_gamma]{DegradSim::sim_gamma()}}.
-\item Power-law Wiener: Gaussian increments of mean
-\eqn{\mu (t_j^r - t_{j-1}^r)} and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
-It is not the time-scaled Wiener process \eqn{Y_{A(t)}} of \code{DegradSim},
-whose time scale changes both the mean and the variance.
+\item Power-law and exponential-trend Wiener: Gaussian increments of mean
+\eqn{\mu (\Lambda(t_j) - \Lambda(t_{j-1}))}, with \eqn{\Lambda(t) = t^r}
+or \eqn{e^{\lambda t} - 1}, and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
+They are not the time-scaled Wiener process \eqn{Y_{A(t)}} of
+\code{DegradSim}, whose time scale changes both the mean and the variance.
 \item Meixner: \code{\link[DegradSim:sim_meixner]{DegradSim::sim_meixner()}} draws the increments one at a time,
 which is too slow for the thousands of trajectories of a bootstrap. The
 Meixner increments of a same time step are therefore drawn together, with
@@ -77,6 +78,7 @@ sim_model(t, "ig", c(mu = 0.5, eta = 2), n_traj = 3)
 sim_model(t, "vg", c(theta = 0.5, sigma = 1, nu = 0.5), n_traj = 3)
 sim_model(t, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 3)
 sim_model(t, "wiener_power", c(mu = 1, sigma = 0.3, r = 0.5), n_traj = 3)
+sim_model(t, "wiener_exp", c(mu = 0.5, sigma = 0.3, lambda = 0.1), n_traj = 3)
 sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
 sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 3)
 

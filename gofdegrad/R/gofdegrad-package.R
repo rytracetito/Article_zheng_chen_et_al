@@ -22,7 +22,7 @@
 #'
 #' | Function | Purpose |
 #' |:---|:---|
-#' | [gof_models()] | the eight available candidate models |
+#' | [gof_models()] | the nine available candidate models |
 #' | [fit_model()] | maximum likelihood estimation of a candidate model |
 #' | [sim_model()] | simulation of a candidate model |
 #' | [sim_path()] | simulation of general path models |
@@ -44,6 +44,7 @@
 #' | `"vg"` | variance-gamma | `theta`, `sigma`, `nu` |
 #' | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 #' | `"wiener_power"` | Wiener, trend \eqn{\mu t^r} | `mu`, `sigma`, `r` |
+#' | `"wiener_exp"` | Wiener, trend \eqn{\mu (e^{\lambda t} - 1)} | `mu`, `sigma`, `lambda` |
 #' | `"gamma_power"` | gamma, shape function \eqn{a t^r} | `a`, `b`, `r` |
 #' | `"ig_re"` | inverse Gaussian with random drift (Peng, 2015, model \eqn{M_3}) | `xi`, `sd_delta`, `eta` |
 #'

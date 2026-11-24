@@ -77,6 +77,14 @@ model_catalogue <- function() {
       fit = function(d) fit_wiener_power(d),
       simulate = function(theta, t, n) sim_wiener_power_levels(theta, t, n)
     ),
+    wiener_exp = list(
+      process = "Wiener with exponential trend", parameters = c("mu", "sigma", "lambda"), increasing = FALSE,
+      law = "X(t) - X(s) ~ N(mu (exp(lambda t) - exp(lambda s)), sigma^2 (t - s))",
+      estimation = "closed form for (mu, sigma) given lambda, profile likelihood in lambda",
+      simulation = "exact Gaussian increments, mean mu (exp(lambda t) - exp(lambda s)), variance sigma^2 (t - s)",
+      fit = function(d) fit_wiener_exp(d),
+      simulate = function(theta, t, n) sim_wiener_exp_levels(theta, t, n)
+    ),
     gamma_power = list(
       process = "gamma with power-law shape function", parameters = c("a", "b", "r"), increasing = TRUE,
       law = "X(t) - X(s) ~ Gamma(shape a (t^r - s^r), rate b)",
@@ -105,7 +113,7 @@ model_catalogue <- function() {
 #' Candidate models available in the package
 #'
 #' @description
-#' Lists the eight candidate models that can be tested by [gof_test()],
+#' Lists the nine candidate models that can be tested by [gof_test()],
 #' fitted by [fit_model()] and simulated by [sim_model()], with their
 #' parameters, the law of their increments and the methods used for the
 #' estimation and the simulation.
@@ -113,9 +121,10 @@ model_catalogue <- function() {
 #' @details
 #' All the models start from \eqn{X(0) = 0}. The first five are Lévy
 #' processes (independent and stationary increments): all the units follow
-#' the same process. The next two have a power-law time transformation,
+#' the same process. The next three have a transformed trend: a power law
 #' \eqn{t^r}, which gives a concave (\eqn{r < 1}) or convex (\eqn{r > 1})
-#' mean degradation path. The last one is a random-effects model: each unit
+#' mean degradation path, or an exponential \eqn{e^{\lambda t} - 1}, which
+#' gives a convex path. The last one is a random-effects model: each unit
 #' degrades at its own mean rate, drawn from a common distribution.
 #'
 #' * `"wiener"`: Wiener process with drift,
@@ -133,7 +142,13 @@ model_catalogue <- function() {
 #'   negative.
 #' * `"wiener_power"`: Wiener process with power-law trend,
 #'   \eqn{X(t) = \mu t^r + \sigma B(t)}, the non-homogeneous Wiener model
-#'   of Zheng et al. (2026): the trend is transformed, not the variance.
+#'   of Zheng et al. (2026, equation 16): the trend is transformed, not the
+#'   variance.
+#' * `"wiener_exp"`: Wiener process with exponential trend,
+#'   \eqn{X(t) = \mu (e^{\lambda t} - 1) + \sigma B(t)} with
+#'   \eqn{\lambda > 0}, the generalized Wiener model of Zheng et al. (2026,
+#'   equation 17) with \eqn{\Lambda(t) = e^{\lambda t} - 1}; increments can
+#'   be negative.
 #' * `"gamma_power"`: gamma process with shape function \eqn{a t^r} and
 #'   rate \eqn{b}; increasing.
 #' * `"ig_re"`: inverse Gaussian process with random drift, the model
@@ -262,14 +277,22 @@ sim_meixner_levels <- function(theta, t, n) {
   cumulate(dX)
 }
 
-sim_wiener_power_levels <- function(theta, t, n) {
-  if (theta[["sigma"]] <= 0) stop("sigma must be positive")
-  if (theta[["r"]] <= 0) stop("r must be positive")
-  dL <- diff(c(0, t)^theta[["r"]])
+sim_wiener_trend_levels <- function(mu, sigma, dL, t, n) {
+  if (sigma <= 0) stop("sigma must be positive")
   dt <- diff(c(0, t))
-  dX <- matrix(stats::rnorm(n * length(t)), n, length(t)) * matrix(theta[["sigma"]] * sqrt(dt), n, length(t), byrow = TRUE) +
-    matrix(theta[["mu"]] * dL, n, length(t), byrow = TRUE)
+  dX <- matrix(stats::rnorm(n * length(t)), n, length(t)) * matrix(sigma * sqrt(dt), n, length(t), byrow = TRUE) +
+    matrix(mu * dL, n, length(t), byrow = TRUE)
   cumulate(dX)
+}
+
+sim_wiener_power_levels <- function(theta, t, n) {
+  if (theta[["r"]] <= 0) stop("r must be positive")
+  sim_wiener_trend_levels(theta[["mu"]], theta[["sigma"]], diff(c(0, t)^theta[["r"]]), t, n)
+}
+
+sim_wiener_exp_levels <- function(theta, t, n) {
+  if (theta[["lambda"]] <= 0) stop("lambda must be positive")
+  sim_wiener_trend_levels(theta[["mu"]], theta[["sigma"]], diff(expm1(theta[["lambda"]] * c(0, t))), t, n)
 }
 
 cumulate <- function(dX) {

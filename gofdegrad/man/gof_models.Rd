@@ -13,7 +13,7 @@ to give to the other functions), \code{process}, \code{parameters}, \code{increa
 increment between times \eqn{s < t}), \code{estimation} and \code{simulation}.
 }
 \description{
-Lists the eight candidate models that can be tested by \code{\link[=gof_test]{gof_test()}},
+Lists the nine candidate models that can be tested by \code{\link[=gof_test]{gof_test()}},
 fitted by \code{\link[=fit_model]{fit_model()}} and simulated by \code{\link[=sim_model]{sim_model()}}, with their
 parameters, the law of their increments and the methods used for the
 estimation and the simulation.
@@ -21,9 +21,10 @@ estimation and the simulation.
 \details{
 All the models start from \eqn{X(0) = 0}. The first five are Lévy
 processes (independent and stationary increments): all the units follow
-the same process. The next two have a power-law time transformation,
+the same process. The next three have a transformed trend: a power law
 \eqn{t^r}, which gives a concave (\eqn{r < 1}) or convex (\eqn{r > 1})
-mean degradation path. The last one is a random-effects model: each unit
+mean degradation path, or an exponential \eqn{e^{\lambda t} - 1}, which
+gives a convex path. The last one is a random-effects model: each unit
 degrades at its own mean rate, drawn from a common distribution.
 \itemize{
 \item \code{"wiener"}: Wiener process with drift,
@@ -41,7 +42,13 @@ variance \eqn{\nu} per unit of time; increments can be negative.
 negative.
 \item \code{"wiener_power"}: Wiener process with power-law trend,
 \eqn{X(t) = \mu t^r + \sigma B(t)}, the non-homogeneous Wiener model
-of Zheng et al. (2026): the trend is transformed, not the variance.
+of Zheng et al. (2026, equation 16): the trend is transformed, not the
+variance.
+\item \code{"wiener_exp"}: Wiener process with exponential trend,
+\eqn{X(t) = \mu (e^{\lambda t} - 1) + \sigma B(t)} with
+\eqn{\lambda > 0}, the generalized Wiener model of Zheng et al. (2026,
+equation 17) with \eqn{\Lambda(t) = e^{\lambda t} - 1}; increments can
+be negative.
 \item \code{"gamma_power"}: gamma process with shape function \eqn{a t^r} and
 rate \eqn{b}; increasing.
 \item \code{"ig_re"}: inverse Gaussian process with random drift, the model

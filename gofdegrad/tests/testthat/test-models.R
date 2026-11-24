@@ -5,15 +5,16 @@ true_theta <- list(
   vg = c(theta = 0.5, sigma = 1, nu = 0.5),
   meixner = c(a = 1, b = 0.3, d = 1.5, m = 0.2),
   wiener_power = c(mu = 1, sigma = 0.3, r = 0.5),
+  wiener_exp = c(mu = 0.5, sigma = 0.3, lambda = 0.05),
   gamma_power = c(a = 1, b = 2, r = 1.5),
   ig_re = c(xi = 2, sd_delta = 0.5, eta = 3)
 )
 
-test_that("gof_models lists the eight models", {
+test_that("gof_models lists the nine models", {
   g <- gof_models()
   expect_s3_class(g, "data.frame")
   expect_equal(g$model, names(true_theta))
-  expect_equal(g$increasing, c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE))
+  expect_equal(g$increasing, c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE))
 })
 
 test_that("sim_model returns DegradSim matrices starting at 0", {
@@ -41,8 +42,8 @@ test_that("the increasing models give increasing trajectories", {
 test_that("fit_model recovers the parameters on large samples", {
   set.seed(2)
   t <- 0:30
-  tol <- c(wiener = 0.05, gamma = 0.05, ig = 0.05, vg = 0.2, wiener_power = 0.05, gamma_power = 0.05,
-           ig_re = 0.1)
+  tol <- c(wiener = 0.05, gamma = 0.05, ig = 0.05, vg = 0.2, wiener_power = 0.05,
+           gamma_power = 0.05, ig_re = 0.1)
   for (m in names(tol)) {
     x <- sim_model(t, m, true_theta[[m]], n_traj = 300)
     e <- fit_model(x, m)
@@ -58,6 +59,33 @@ test_that("fit_model works with irregular inspection times", {
     x <- sim_model(t, m, true_theta[[m]], n_traj = 300)
     expect_equal(as.vector(fit_model(x, m)), unname(true_theta[[m]]), tolerance = 0.1, info = m)
   }
+})
+
+test_that("fit_model recovers the exponential-trend Wiener model", {
+  # mu and lambda compensate each other: a long enough grid is needed for mu,
+  # while sigma, lambda and the mean path are well estimated
+  th <- true_theta$wiener_exp
+  set.seed(8)
+  e <- fit_model(sim_model(0:50, "wiener_exp", th, n_traj = 300), "wiener_exp")
+  expect_equal(as.vector(e), unname(th), tolerance = 0.15)
+  set.seed(9)
+  t <- c(0, round(cumsum(runif(40, 0.8, 1.6)), 2))
+  e <- fit_model(sim_model(t, "wiener_exp", th, n_traj = 300), "wiener_exp")
+  expect_equal(e[["sigma"]], th[["sigma"]], tolerance = 0.05)
+  expect_equal(e[["lambda"]], th[["lambda"]], tolerance = 0.15)
+  expect_equal(e[["mu"]] * expm1(e[["lambda"]] * max(t)), th[["mu"]] * expm1(th[["lambda"]] * max(t)),
+               tolerance = 0.03)
+})
+
+test_that("the exponential-trend Wiener model has the right mean and variance", {
+  set.seed(7)
+  th <- true_theta$wiener_exp
+  t <- c(10, 25, 50)
+  X <- gof_data(sim_model(t, "wiener_exp", th, n_traj = 50000))$X
+  expect_equal(unname(colMeans(X)), th[["mu"]] * expm1(th[["lambda"]] * t), tolerance = 0.02)
+  expect_equal(unname(apply(X, 2, stats::var)), th[["sigma"]]^2 * t, tolerance = 0.03)
+  expect_warning(fit_model(sim_model(0:20, "wiener", c(mu = 1, sigma = 0.2), n_traj = 10), "wiener_exp"),
+                 "almost linear")
 })
 
 test_that("the random-effects likelihood is the integral of the conditional likelihood", {

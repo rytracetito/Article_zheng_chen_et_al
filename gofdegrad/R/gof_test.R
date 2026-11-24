@@ -15,7 +15,8 @@
 #'   times, which can be irregular.
 #' @param model Candidate model under the null hypothesis: the name of a
 #'   model of [gof_models()] (`"wiener"`, `"gamma"`, `"ig"`, `"vg"`,
-#'   `"meixner"`, `"wiener_power"`, `"gamma_power"`, `"ig_re"`) or a model
+#'   `"meixner"`, `"wiener_power"`, `"wiener_exp"`, `"gamma_power"`, `"ig_re"`)
+#'   or a model
 #'   built with [custom_model()].
 #' @param t Inspection times, only when `x` is a matrix with one row per
 #'   trajectory or a vector (see [gof_data()]).

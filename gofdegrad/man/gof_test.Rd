@@ -23,7 +23,8 @@ times, which can be irregular.}
 
 \item{model}{Candidate model under the null hypothesis: the name of a
 model of \code{\link[=gof_models]{gof_models()}} (\code{"wiener"}, \code{"gamma"}, \code{"ig"}, \code{"vg"},
-\code{"meixner"}, \code{"wiener_power"}, \code{"gamma_power"}, \code{"ig_re"}) or a model
+\code{"meixner"}, \code{"wiener_power"}, \code{"wiener_exp"}, \code{"gamma_power"}, \code{"ig_re"})
+or a model
 built with \code{\link[=custom_model]{custom_model()}}.}
 
 \item{t}{Inspection times, only when \code{x} is a matrix with one row per

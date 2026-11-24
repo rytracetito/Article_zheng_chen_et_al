@@ -41,11 +41,12 @@ private, a GitHub token is needed: `usethis::create_github_token()`, then
 | `"vg"` | variance-gamma | `theta`, `sigma`, `nu` |
 | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 | `"wiener_power"` | Wiener, trend `mu t^r` | `mu`, `sigma`, `r` |
+| `"wiener_exp"` | Wiener, trend `mu (exp(lambda t) - 1)` | `mu`, `sigma`, `lambda` |
 | `"gamma_power"` | gamma, shape function `a t^r` | `a`, `b`, `r` |
 | `"ig_re"` | inverse Gaussian with random drift (Peng, 2015, model M3) | `xi`, `sd_delta`, `eta` |
 
 `gof_models()` gives the law of the increments of each model. In the first
-seven models all the units follow the same process, with the same parameters.
+eight models all the units follow the same process, with the same parameters.
 
 The model `"ig_re"` lets the mean degradation rate vary from unit to unit:
 unit `i` degrades at its own rate `mu_i = 1/delta_i`, with
@@ -114,7 +115,7 @@ power_study(function() sim_path(0:50, "linear", phi_mean = 0.2, phi_sd = 0.05,
 | `gof_test()` | goodness-of-fit test of one candidate model |
 | `compare_models()` | tests of several candidate models on the same data |
 | `power_study()` | empirical level or power of the test |
-| `gof_models()` | the eight candidate models |
+| `gof_models()` | the nine candidate models |
 | `fit_model()` | maximum likelihood estimation of a candidate model |
 | `sim_model()` | simulation of a candidate model |
 | `sim_path()` | simulation of general path models |

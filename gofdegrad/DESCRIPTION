@@ -8,9 +8,10 @@ Description: Goodness-of-fit test for degradation models of Zheng, Wang,
     the observed trajectories are compared with trajectories simulated under
     the fitted candidate model through Kolmogorov-Smirnov and Cramer-von Mises
     type similarity measures, and the critical values are obtained by
-    parametric bootstrap. Eight candidate models are available (Wiener, gamma,
+    parametric bootstrap. Nine candidate models are available (Wiener, gamma,
     inverse Gaussian, variance-gamma and Meixner processes, Wiener and gamma
-    processes with power-law time transformation, and inverse Gaussian
+    processes with power-law time transformation, Wiener process with
+    exponential trend, and inverse Gaussian
     process with random drift of Peng (2015)
     <doi:10.1080/00401706.2013.879077>), with possibly
     irregular inspection times common to all trajectories; any other model can
