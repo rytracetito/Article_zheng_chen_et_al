@@ -22,7 +22,7 @@
 #'
 #' | Function | Purpose |
 #' |:---|:---|
-#' | [gof_models()] | the seven available candidate models |
+#' | [gof_models()] | the eight available candidate models |
 #' | [fit_model()] | maximum likelihood estimation of a candidate model |
 #' | [sim_model()] | simulation of a candidate model |
 #' | [sim_path()] | simulation of general path models |
@@ -45,11 +45,15 @@
 #' | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 #' | `"wiener_power"` | Wiener, trend \eqn{\mu t^r} | `mu`, `sigma`, `r` |
 #' | `"gamma_power"` | gamma, shape function \eqn{a t^r} | `a`, `b`, `r` |
+#' | `"ig_re"` | inverse Gaussian, one rate per unit | `xi`, `sd_delta`, `eta` |
 #'
 #' The first five are Lévy processes, estimated with the package `levyfit`
-#' and simulated with the package `DegradSim`; [gof_models()] gives the law
-#' of their increments. Any other model, for instance a general path model,
-#' can be tested with [custom_model()].
+#' and simulated with the package `DegradSim`: all the units follow the same
+#' process. In the random-effects model `"ig_re"`, each unit degrades at its
+#' own mean rate, drawn from a common distribution (Wang and Xu, 2010).
+#' [gof_models()] gives the law of the increments of each model. Any other
+#' model, for instance a general path model, can be tested with
+#' [custom_model()].
 #'
 #' @section Getting started:
 #' A test always follows the same three steps.
@@ -91,6 +95,10 @@
 #' Ye, Z.-S. and Xie, M. (2015). Stochastic modelling and analysis of
 #' degradation for highly reliable products. *Applied Stochastic Models in
 #' Business and Industry*, 31(1), 16-32. \doi{10.1002/asmb.2063}
+#'
+#' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+#' degradation data. *Technometrics*, 52(2), 188-197.
+#' \doi{10.1198/TECH.2009.08197}
 #'
 #' Meeker, W. Q., Escobar, L. A. and Pascual, F. G. (2021). *Statistical
 #' Methods for Reliability Data*, 2nd edition. Wiley.

@@ -26,7 +26,7 @@ Test (click on a function name for its help page):\tabular{ll}{
 
 Models and data:\tabular{ll}{
    Function \tab Purpose \cr
-   \code{\link[=gof_models]{gof_models()}} \tab the seven available candidate models \cr
+   \code{\link[=gof_models]{gof_models()}} \tab the eight available candidate models \cr
    \code{\link[=fit_model]{fit_model()}} \tab maximum likelihood estimation of a candidate model \cr
    \code{\link[=sim_model]{sim_model()}} \tab simulation of a candidate model \cr
    \code{\link[=sim_path]{sim_path()}} \tab simulation of general path models \cr
@@ -51,13 +51,17 @@ frame by \link[=as.data.frame.gof_test]{as.data.frame()} and plotted by
    \code{"meixner"} \tab Meixner \tab \code{a}, \code{b}, \code{d}, \code{m} \cr
    \code{"wiener_power"} \tab Wiener, trend \eqn{\mu t^r} \tab \code{mu}, \code{sigma}, \code{r} \cr
    \code{"gamma_power"} \tab gamma, shape function \eqn{a t^r} \tab \code{a}, \code{b}, \code{r} \cr
+   \code{"ig_re"} \tab inverse Gaussian, one rate per unit \tab \code{xi}, \code{sd_delta}, \code{eta} \cr
 }
 
 
 The first five are Lévy processes, estimated with the package \code{levyfit}
-and simulated with the package \code{DegradSim}; \code{\link[=gof_models]{gof_models()}} gives the law
-of their increments. Any other model, for instance a general path model,
-can be tested with \code{\link[=custom_model]{custom_model()}}.
+and simulated with the package \code{DegradSim}: all the units follow the same
+process. In the random-effects model \code{"ig_re"}, each unit degrades at its
+own mean rate, drawn from a common distribution (Wang and Xu, 2010).
+\code{\link[=gof_models]{gof_models()}} gives the law of the increments of each model. Any other
+model, for instance a general path model, can be tested with
+\code{\link[=custom_model]{custom_model()}}.
 }
 
 \section{Getting started}{
@@ -120,6 +124,10 @@ International}. \doi{10.1002/qre.70382}
 Ye, Z.-S. and Xie, M. (2015). Stochastic modelling and analysis of
 degradation for highly reliable products. \emph{Applied Stochastic Models in
 Business and Industry}, 31(1), 16-32. \doi{10.1002/asmb.2063}
+
+Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+degradation data. \emph{Technometrics}, 52(2), 188-197.
+\doi{10.1198/TECH.2009.08197}
 
 Meeker, W. Q., Escobar, L. A. and Pascual, F. G. (2021). \emph{Statistical
 Methods for Reliability Data}, 2nd edition. Wiley.

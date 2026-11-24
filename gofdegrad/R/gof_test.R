@@ -15,8 +15,8 @@
 #'   times, which can be irregular.
 #' @param model Candidate model under the null hypothesis: the name of a
 #'   model of [gof_models()] (`"wiener"`, `"gamma"`, `"ig"`, `"vg"`,
-#'   `"meixner"`, `"wiener_power"`, `"gamma_power"`) or a model built with
-#'   [custom_model()].
+#'   `"meixner"`, `"wiener_power"`, `"gamma_power"`, `"ig_re"`) or a model
+#'   built with [custom_model()].
 #' @param t Inspection times, only when `x` is a matrix with one row per
 #'   trajectory or a vector (see [gof_data()]).
 #' @param B Number of bootstrap samples, \eqn{L} in the article (default
@@ -160,6 +160,13 @@
 #'   laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
 #'   set.seed(30)
 #'   gof_test(laser, "wiener", B = 200)
+#'
+#'   # 11. Same data: the inverse Gaussian model with one rate for all the
+#'   #     lasers is rejected, the model with one rate per laser is not
+#'   set.seed(30)
+#'   gof_test(laser, "ig", B = 200)
+#'   set.seed(30)
+#'   gof_test(laser, "ig_re", B = 200)
 #' }
 #' }
 #' @export

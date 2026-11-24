@@ -88,6 +88,16 @@ model_catalogue <- function() {
         r <- theta[["r"]]
         levels_of(DegradSim::sim_gamma(c(0, t), b = theta[["b"]], A = function(s) a * s^r, n_traj = n))
       }
+    ),
+    ig_re = list(
+      process = "inverse Gaussian with random drift", parameters = c("xi", "sd_delta", "eta"),
+      increasing = TRUE,
+      law = paste("delta_i ~ N(xi, sd_delta^2) truncated to delta > 0, then",
+                  "X_i(t) - X_i(s) ~ IG(mean (t - s) / delta_i, shape eta (t - s)^2)"),
+      estimation = "exact marginal likelihood (Wang and Xu, 2010), quasi-Newton",
+      simulation = "truncated normal delta_i, then inverse Gaussian increments (Michael, Schucany and Haas)",
+      fit = function(d) fit_ig_re(d),
+      simulate = function(theta, t, n) sim_ig_re_levels(theta, t, n)
     )
   )
 }
@@ -95,16 +105,18 @@ model_catalogue <- function() {
 #' Candidate models available in the package
 #'
 #' @description
-#' Lists the seven candidate models that can be tested by [gof_test()],
+#' Lists the eight candidate models that can be tested by [gof_test()],
 #' fitted by [fit_model()] and simulated by [sim_model()], with their
 #' parameters, the law of their increments and the methods used for the
 #' estimation and the simulation.
 #'
 #' @details
-#' All the models start from \eqn{X(0) = 0} and have independent
-#' increments. The first five are Lévy processes (homogeneous in time); the
-#' last two have a power-law time transformation, \eqn{t^r}, which gives a
-#' concave (\eqn{r < 1}) or convex (\eqn{r > 1}) mean degradation path.
+#' All the models start from \eqn{X(0) = 0}. The first five are Lévy
+#' processes (independent and stationary increments): all the units follow
+#' the same process. The next two have a power-law time transformation,
+#' \eqn{t^r}, which gives a concave (\eqn{r < 1}) or convex (\eqn{r > 1})
+#' mean degradation path. The last one is a random-effects model: each unit
+#' degrades at its own mean rate, drawn from a common distribution.
 #'
 #' * `"wiener"`: Wiener process with drift,
 #'   \eqn{X(t) = \mu t + \sigma B(t)}; increments can be negative.
@@ -124,9 +136,25 @@ model_catalogue <- function() {
 #'   of Zheng et al. (2026): the trend is transformed, not the variance.
 #' * `"gamma_power"`: gamma process with shape function \eqn{a t^r} and
 #'   rate \eqn{b}; increasing.
+#' * `"ig_re"`: inverse Gaussian process with random drift (Wang and Xu,
+#'   2010). Unit \eqn{i} has its own mean degradation rate
+#'   \eqn{\mu_i = 1/\delta_i}, where \eqn{\delta_i} follows the normal
+#'   distribution \eqn{N(\xi, \sigma_\delta^2)} truncated to
+#'   \eqn{\delta_i > 0}; given \eqn{\delta_i}, the trajectory is an inverse
+#'   Gaussian process, \eqn{X_i(t) - X_i(s) \sim IG((t - s)/\delta_i, \eta (t - s)^2)}.
+#'   \eqn{1/\xi} is a typical rate and \eqn{\sigma_\delta} measures the
+#'   differences of rate between units; \eqn{\sigma_\delta \to 0} gives back
+#'   the model `"ig"` with \eqn{\mu = 1/\xi}. Increasing.
 #'
-#' The increasing models (gamma, inverse Gaussian, power-law gamma) cannot
-#' be fitted to data with a negative increment. An increment exactly equal to
+#' The model `"ig"` assumes that all the units degrade at the same mean rate,
+#' the differences between trajectories coming only from the randomness of
+#' the increments: the spread of the trajectories then grows like
+#' \eqn{\sqrt{t}}. When some units are consistently faster than others, the
+#' spread grows like \eqn{t}, and `"ig_re"` is the suitable model.
+#'
+#' The increasing models (gamma, inverse Gaussian, power-law gamma,
+#' random-effects inverse Gaussian) cannot be fitted to data with a negative
+#' increment. An increment exactly equal to
 #' 0, due to the rounding of the levels, is replaced by a tiny positive value
 #' with a warning (see [fit_model()]).
 #'
@@ -144,6 +172,10 @@ model_catalogue <- function() {
 #' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
 #' degradation data. *Technometrics*, 52(2), 188-197.
 #' \doi{10.1198/TECH.2009.08197}
+#'
+#' Michael, J. R., Schucany, W. R. and Haas, R. W. (1976). Generating random
+#' variates using transformations with multiple roots. *The American
+#' Statistician*, 30(2), 88-90. \doi{10.1080/00031305.1976.10479147}
 #'
 #' @seealso [gof_test()], [fit_model()], [sim_model()], [custom_model()] to
 #'   test another model.

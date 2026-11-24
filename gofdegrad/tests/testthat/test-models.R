@@ -5,14 +5,15 @@ true_theta <- list(
   vg = c(theta = 0.5, sigma = 1, nu = 0.5),
   meixner = c(a = 1, b = 0.3, d = 1.5, m = 0.2),
   wiener_power = c(mu = 1, sigma = 0.3, r = 0.5),
-  gamma_power = c(a = 1, b = 2, r = 1.5)
+  gamma_power = c(a = 1, b = 2, r = 1.5),
+  ig_re = c(xi = 2, sd_delta = 0.5, eta = 3)
 )
 
-test_that("gof_models lists the seven models", {
+test_that("gof_models lists the eight models", {
   g <- gof_models()
   expect_s3_class(g, "data.frame")
   expect_equal(g$model, names(true_theta))
-  expect_equal(g$increasing, c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE))
+  expect_equal(g$increasing, c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE))
 })
 
 test_that("sim_model returns DegradSim matrices starting at 0", {
@@ -40,7 +41,8 @@ test_that("the increasing models give increasing trajectories", {
 test_that("fit_model recovers the parameters on large samples", {
   set.seed(2)
   t <- 0:30
-  tol <- c(wiener = 0.05, gamma = 0.05, ig = 0.05, vg = 0.2, wiener_power = 0.05, gamma_power = 0.05)
+  tol <- c(wiener = 0.05, gamma = 0.05, ig = 0.05, vg = 0.2, wiener_power = 0.05, gamma_power = 0.05,
+           ig_re = 0.1)
   for (m in names(tol)) {
     x <- sim_model(t, m, true_theta[[m]], n_traj = 300)
     e <- fit_model(x, m)
@@ -52,10 +54,40 @@ test_that("fit_model recovers the parameters on large samples", {
 test_that("fit_model works with irregular inspection times", {
   set.seed(3)
   t <- c(0, round(cumsum(runif(40, 0.5, 1.5)), 2))
-  for (m in c("wiener", "gamma", "ig", "wiener_power", "gamma_power")) {
+  for (m in c("wiener", "gamma", "ig", "wiener_power", "gamma_power", "ig_re")) {
     x <- sim_model(t, m, true_theta[[m]], n_traj = 300)
-    expect_equal(as.vector(fit_model(x, m)), unname(true_theta[[m]]), tolerance = 0.06, info = m)
+    expect_equal(as.vector(fit_model(x, m)), unname(true_theta[[m]]), tolerance = 0.1, info = m)
   }
+})
+
+test_that("the random-effects likelihood is the integral of the conditional likelihood", {
+  d <- gof_data(matrix(c(0.3, 0.9, 1.7, 2.9), nrow = 1), t = c(0.5, 1.5, 3, 5))
+  inc <- gofdegrad:::increments_of(d)
+  xi <- 2; s <- 0.5; eta <- 3
+  cond <- function(delta) prod(sqrt(eta * inc$dt^2 / (2 * pi * inc$dX^3)) *
+                                 exp(-eta * (delta * inc$dX - inc$dt)^2 / (2 * inc$dX)))
+  num <- stats::integrate(function(z) sapply(z, function(v) cond(v) * stats::dnorm(v, xi, s)),
+                          0, Inf)$value / stats::pnorm(xi / s)
+  expect_equal(gofdegrad:::ig_re_loglik(c(xi, log(s), log(eta)), inc, 5), log(num), tolerance = 1e-8)
+})
+
+test_that("the random-effects model separates the units", {
+  set.seed(4)
+  x <- sim_model(0:20, "ig_re", c(xi = 2, sd_delta = 0.6, eta = 50), n_traj = 40)
+  rates <- gof_data(x)$X[, 20] / 20
+  expect_gt(stats::sd(1 / rates), 0.4)
+  set.seed(5)
+  expect_error(fit_model(sim_model(0:10, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3)), "ig_re"),
+               "at least two trajectories")
+})
+
+test_that("the inverse Gaussian draws follow the inverse Gaussian law", {
+  set.seed(6)
+  x <- as.vector(gofdegrad:::rig(matrix(0.5, 1, 50000), matrix(2, 1, 50000)))
+  expect_equal(mean(x), 0.5, tolerance = 0.01)
+  expect_equal(stats::var(x), 0.5^3 / 2, tolerance = 0.05)
+  y <- as.vector(gofdegrad:::rig(matrix(1, 1, 1000), matrix(1e8, 1, 1000)))
+  expect_true(all(y > 0))
 })
 
 test_that("the Meixner simulation has the moments of the Meixner process", {

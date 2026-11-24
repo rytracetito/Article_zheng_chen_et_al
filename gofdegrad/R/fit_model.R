@@ -12,7 +12,7 @@
 #'   one row per trajectory (with `t`), data frame (`id`, `t`, `X`) or list
 #'   of data frames.
 #' @param model Name of the model, one of `"wiener"`, `"gamma"`, `"ig"`,
-#'   `"vg"`, `"meixner"`, `"wiener_power"`, `"gamma_power"` (see
+#'   `"vg"`, `"meixner"`, `"wiener_power"`, `"gamma_power"`, `"ig_re"` (see
 #'   [gof_models()]), or a model built with [custom_model()].
 #' @param t Inspection times, only when `x` is a matrix with one row per
 #'   trajectory or a vector (see [gof_data()]).
@@ -44,8 +44,25 @@
 #' the estimate is at a boundary of this interval (for instance with a
 #' single trajectory, whose trend is poorly identified).
 #'
-#' **Increasing models.** The gamma, inverse Gaussian and power-law gamma
-#' models only increase: a negative increment in the data gives an error. An
+#' For the random-effects model `"ig_re"` (Wang and Xu, 2010), the rates
+#' \eqn{\delta_i} of the units are integrated out: the likelihood of the
+#' trajectory \eqn{i} has the closed form
+#' \deqn{\ell_i = \sum_j \frac{1}{2}\ln\frac{\eta \Delta t_j^2}{2\pi \Delta x_{ij}^3}
+#'   - \frac{\eta Q_i}{2} - \ln\sigma_\delta - \frac{1}{2}\ln A_i
+#'   + \frac{1}{2}\left(\frac{B_i^2}{A_i} - \frac{\xi^2}{\sigma_\delta^2}\right)
+#'   + \ln\Phi\left(\frac{B_i}{\sqrt{A_i}}\right) - \ln\Phi\left(\frac{\xi}{\sigma_\delta}\right),}
+#' with \eqn{S_i = X_i(t_n)} the last level of the trajectory,
+#' \eqn{Q_i = \sum_j \Delta t_j^2/\Delta x_{ij}},
+#' \eqn{A_i = \eta S_i + 1/\sigma_\delta^2},
+#' \eqn{B_i = \eta t_n + \xi/\sigma_\delta^2} and \eqn{\Phi} the standard
+#' normal distribution function. The sum of the \eqn{\ell_i} is maximized by
+#' quasi-Newton (BFGS) in \eqn{(\xi, \ln\sigma_\delta, \ln\eta)}, from
+#' starting values built on the rates \eqn{t_n/S_i} of the units. At least
+#' two trajectories are needed, since the differences between units are
+#' estimated from the units themselves.
+#'
+#' **Increasing models.** The gamma, inverse Gaussian, power-law gamma and
+#' random-effects inverse Gaussian models only increase: a negative increment in the data gives an error. An
 #' increment exactly equal to 0 is usually a rounding effect: a very small
 #' increment, added to a large level, disappears in the computer. It is
 #' replaced by the machine precision times the largest level, an upper bound
@@ -65,6 +82,10 @@
 #' of degradation models using goodness-of-fit test based on similarity
 #' measures and parametric bootstrap. *Quality and Reliability Engineering
 #' International*. \doi{10.1002/qre.70382}
+#'
+#' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+#' degradation data. *Technometrics*, 52(2), 188-197.
+#' \doi{10.1198/TECH.2009.08197}
 #'
 #' @seealso [gof_models()], [sim_model()], [gof_test()], and the package
 #'   `levyfit` for confidence intervals and more estimation options.
@@ -88,21 +109,29 @@
 #' x <- sim_model(0:40, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 10)
 #' fit_model(x, "gamma_power")
 #'
-#' # 5. A matrix with one row per trajectory and the times given in t
+#' # 5. Inverse Gaussian process with random drift: each unit has its own
+#' #    rate 1/delta_i, with delta_i ~ N(xi, sd_delta^2)
+#' x <- sim_model(0:20, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 30)
+#' fit_model(x, "ig_re")
+#' fit_model(x, "ig")   # a single rate for all the units
+#'
+#' # 6. A matrix with one row per trajectory and the times given in t
 #' X <- matrix(c(0.6, 1.3, 2.2, 3.1,
 #'               0.4, 1.1, 1.9, 2.4,
 #'               0.7, 1.2, 2.5, 3.3), nrow = 3, byrow = TRUE)
 #' fit_model(X, "gamma", t = c(1, 2, 3.5, 5))
 #'
-#' # 6. A decrease makes the increasing models impossible
+#' # 7. A decrease makes the increasing models impossible
 #' try(fit_model(c(0, 1, 0.8, 2), "gamma", t = c(0, 1, 2, 3)))
 #'
-#' # 7. Real data: GaAs laser (package SMRD.data)
+#' # 8. Real data: GaAs laser (package SMRD.data); with random drift, the
+#' #    typical rate is 1/xi and the lasers differ through sd_delta
 #' if (requireNamespace("SMRD.data", quietly = TRUE)) {
 #'   laser <- SMRD.data::gaaslaser
 #'   laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
 #'   fit_model(laser, "wiener")
 #'   fit_model(laser, "wiener_power")
+#'   fit_model(laser, "ig_re")
 #' }
 #' @export
 fit_model <- function(x, model, t = NULL) {
@@ -156,6 +185,13 @@ check_estimate <- function(est, mod) {
 #'   the same law (numerical inversion of the distribution function with
 #'   `Runuran`, parameters \eqn{a}, \eqn{b}, \eqn{d \Delta t},
 #'   \eqn{m \Delta t}).
+#' * Inverse Gaussian with random drift: for each trajectory, \eqn{\delta_i}
+#'   is drawn from the normal distribution \eqn{N(\xi, \sigma_\delta^2)}
+#'   truncated to \eqn{(0, \infty)}, by inversion of its distribution
+#'   function; then the inverse Gaussian increments
+#'   \eqn{IG(\Delta t_j/\delta_i, \eta \Delta t_j^2)} are drawn together for
+#'   all the trajectories by the method of Michael, Schucany and Haas (1976),
+#'   as in [DegradSim::sim_ig()].
 #'
 #' The parametrizations are those of [gof_models()]: in particular the gamma
 #' model uses the **rate** \eqn{b}, as in `DegradSim` and `levyfit`.
@@ -166,6 +202,15 @@ check_estimate <- function(est, mod) {
 #'   with [DegradSim::plot_traj()], converted to a data frame with
 #'   [DegradSim::traj_df()], and given directly to [fit_model()] and
 #'   [gof_test()].
+#'
+#' @references
+#' Michael, J. R., Schucany, W. R. and Haas, R. W. (1976). Generating random
+#' variates using transformations with multiple roots. *The American
+#' Statistician*, 30(2), 88-90. \doi{10.1080/00031305.1976.10479147}
+#'
+#' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+#' degradation data. *Technometrics*, 52(2), 188-197.
+#' \doi{10.1198/TECH.2009.08197}
 #'
 #' @seealso [gof_models()], [fit_model()], [sim_path()] for general path
 #'   models, and the package `DegradSim` for more simulation options
@@ -179,7 +224,7 @@ check_estimate <- function(est, mod) {
 #' x
 #' DegradSim::plot_traj(x)
 #'
-#' # 2. The seven models, with the same inspection times
+#' # 2. The other models, with the same inspection times
 #' t <- 0:20
 #' sim_model(t, "gamma", c(a = 2, b = 3), n_traj = 3)
 #' sim_model(t, "ig", c(mu = 0.5, eta = 2), n_traj = 3)
@@ -187,6 +232,14 @@ check_estimate <- function(est, mod) {
 #' sim_model(t, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 3)
 #' sim_model(t, "wiener_power", c(mu = 1, sigma = 0.3, r = 0.5), n_traj = 3)
 #' sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
+#' sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 3)
+#'
+#' # The spread of the trajectories: like sqrt(t) without random effects,
+#' # like t with random effects (each unit has its own rate)
+#' DegradSim::plot_traj(sim_model(t, "ig", c(mu = 0.5, eta = 3), n_traj = 20),
+#'                      "Same rate for all the units")
+#' DegradSim::plot_traj(sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 20),
+#'                      "One rate per unit")
 #'
 #' # 3. Irregular inspection times, more and more frequent
 #' t <- DegradSim::inspection_times("increasing", n = 25, tmax = 50)$time

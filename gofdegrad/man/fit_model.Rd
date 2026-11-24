@@ -13,7 +13,7 @@ one row per trajectory (with \code{t}), data frame (\code{id}, \code{t}, \code{X
 of data frames.}
 
 \item{model}{Name of the model, one of \code{"wiener"}, \code{"gamma"}, \code{"ig"},
-\code{"vg"}, \code{"meixner"}, \code{"wiener_power"}, \code{"gamma_power"} (see
+\code{"vg"}, \code{"meixner"}, \code{"wiener_power"}, \code{"gamma_power"}, \code{"ig_re"} (see
 \code{\link[=gof_models]{gof_models()}}), or a model built with \code{\link[=custom_model]{custom_model()}}.}
 
 \item{t}{Inspection times, only when \code{x} is a matrix with one row per
@@ -62,8 +62,25 @@ time scale \eqn{t/t_n} for numerical stability; a warning is given when
 the estimate is at a boundary of this interval (for instance with a
 single trajectory, whose trend is poorly identified).
 
-\strong{Increasing models.} The gamma, inverse Gaussian and power-law gamma
-models only increase: a negative increment in the data gives an error. An
+For the random-effects model \code{"ig_re"} (Wang and Xu, 2010), the rates
+\eqn{\delta_i} of the units are integrated out: the likelihood of the
+trajectory \eqn{i} has the closed form
+\deqn{\ell_i = \sum_j \frac{1}{2}\ln\frac{\eta \Delta t_j^2}{2\pi \Delta x_{ij}^3}
+  - \frac{\eta Q_i}{2} - \ln\sigma_\delta - \frac{1}{2}\ln A_i
+  + \frac{1}{2}\left(\frac{B_i^2}{A_i} - \frac{\xi^2}{\sigma_\delta^2}\right)
+  + \ln\Phi\left(\frac{B_i}{\sqrt{A_i}}\right) - \ln\Phi\left(\frac{\xi}{\sigma_\delta}\right),}
+with \eqn{S_i = X_i(t_n)} the last level of the trajectory,
+\eqn{Q_i = \sum_j \Delta t_j^2/\Delta x_{ij}},
+\eqn{A_i = \eta S_i + 1/\sigma_\delta^2},
+\eqn{B_i = \eta t_n + \xi/\sigma_\delta^2} and \eqn{\Phi} the standard
+normal distribution function. The sum of the \eqn{\ell_i} is maximized by
+quasi-Newton (BFGS) in \eqn{(\xi, \ln\sigma_\delta, \ln\eta)}, from
+starting values built on the rates \eqn{t_n/S_i} of the units. At least
+two trajectories are needed, since the differences between units are
+estimated from the units themselves.
+
+\strong{Increasing models.} The gamma, inverse Gaussian, power-law gamma and
+random-effects inverse Gaussian models only increase: a negative increment in the data gives an error. An
 increment exactly equal to 0 is usually a rounding effect: a very small
 increment, added to a large level, disappears in the computer. It is
 replaced by the machine precision times the largest level, an upper bound
@@ -93,21 +110,29 @@ fit_model(x, "wiener_power")
 x <- sim_model(0:40, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 10)
 fit_model(x, "gamma_power")
 
-# 5. A matrix with one row per trajectory and the times given in t
+# 5. Inverse Gaussian process with random drift: each unit has its own
+#    rate 1/delta_i, with delta_i ~ N(xi, sd_delta^2)
+x <- sim_model(0:20, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 30)
+fit_model(x, "ig_re")
+fit_model(x, "ig")   # a single rate for all the units
+
+# 6. A matrix with one row per trajectory and the times given in t
 X <- matrix(c(0.6, 1.3, 2.2, 3.1,
               0.4, 1.1, 1.9, 2.4,
               0.7, 1.2, 2.5, 3.3), nrow = 3, byrow = TRUE)
 fit_model(X, "gamma", t = c(1, 2, 3.5, 5))
 
-# 6. A decrease makes the increasing models impossible
+# 7. A decrease makes the increasing models impossible
 try(fit_model(c(0, 1, 0.8, 2), "gamma", t = c(0, 1, 2, 3)))
 
-# 7. Real data: GaAs laser (package SMRD.data)
+# 8. Real data: GaAs laser (package SMRD.data); with random drift, the
+#    typical rate is 1/xi and the lasers differ through sd_delta
 if (requireNamespace("SMRD.data", quietly = TRUE)) {
   laser <- SMRD.data::gaaslaser
   laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
   fit_model(laser, "wiener")
   fit_model(laser, "wiener_power")
+  fit_model(laser, "ig_re")
 }
 }
 \references{
@@ -115,6 +140,10 @@ Zheng, J., Wang, Y., Chen, Y. and Xie, M. (2026). Automated verification
 of degradation models using goodness-of-fit test based on similarity
 measures and parametric bootstrap. \emph{Quality and Reliability Engineering
 International}. \doi{10.1002/qre.70382}
+
+Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+degradation data. \emph{Technometrics}, 52(2), 188-197.
+\doi{10.1198/TECH.2009.08197}
 }
 \seealso{
 \code{\link[=gof_models]{gof_models()}}, \code{\link[=sim_model]{sim_model()}}, \code{\link[=gof_test]{gof_test()}}, and the package

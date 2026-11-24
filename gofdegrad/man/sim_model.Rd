@@ -51,6 +51,13 @@ Meixner increments of a same time step are therefore drawn together, with
 the same law (numerical inversion of the distribution function with
 \code{Runuran}, parameters \eqn{a}, \eqn{b}, \eqn{d \Delta t},
 \eqn{m \Delta t}).
+\item Inverse Gaussian with random drift: for each trajectory, \eqn{\delta_i}
+is drawn from the normal distribution \eqn{N(\xi, \sigma_\delta^2)}
+truncated to \eqn{(0, \infty)}, by inversion of its distribution
+function; then the inverse Gaussian increments
+\eqn{IG(\Delta t_j/\delta_i, \eta \Delta t_j^2)} are drawn together for
+all the trajectories by the method of Michael, Schucany and Haas (1976),
+as in \code{\link[DegradSim:sim_ig]{DegradSim::sim_ig()}}.
 }
 
 The parametrizations are those of \code{\link[=gof_models]{gof_models()}}: in particular the gamma
@@ -63,7 +70,7 @@ x <- sim_model(seq(0, 10, by = 0.5), "wiener", c(mu = 0.5, sigma = 0.8), n_traj 
 x
 DegradSim::plot_traj(x)
 
-# 2. The seven models, with the same inspection times
+# 2. The other models, with the same inspection times
 t <- 0:20
 sim_model(t, "gamma", c(a = 2, b = 3), n_traj = 3)
 sim_model(t, "ig", c(mu = 0.5, eta = 2), n_traj = 3)
@@ -71,6 +78,14 @@ sim_model(t, "vg", c(theta = 0.5, sigma = 1, nu = 0.5), n_traj = 3)
 sim_model(t, "meixner", c(a = 1, b = 0.3, d = 1.5, m = 0.2), n_traj = 3)
 sim_model(t, "wiener_power", c(mu = 1, sigma = 0.3, r = 0.5), n_traj = 3)
 sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
+sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 3)
+
+# The spread of the trajectories: like sqrt(t) without random effects,
+# like t with random effects (each unit has its own rate)
+DegradSim::plot_traj(sim_model(t, "ig", c(mu = 0.5, eta = 3), n_traj = 20),
+                     "Same rate for all the units")
+DegradSim::plot_traj(sim_model(t, "ig_re", c(xi = 2, sd_delta = 0.5, eta = 3), n_traj = 20),
+                     "One rate per unit")
 
 # 3. Irregular inspection times, more and more frequent
 t <- DegradSim::inspection_times("increasing", n = 25, tmax = 50)$time
@@ -83,6 +98,15 @@ y <- sim_model(t, "gamma", theta, n_traj = 8)
 
 # 5. All the data in one data frame, for instance to save them
 head(DegradSim::traj_df(y))
+}
+\references{
+Michael, J. R., Schucany, W. R. and Haas, R. W. (1976). Generating random
+variates using transformations with multiple roots. \emph{The American
+Statistician}, 30(2), 88-90. \doi{10.1080/00031305.1976.10479147}
+
+Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
+degradation data. \emph{Technometrics}, 52(2), 188-197.
+\doi{10.1198/TECH.2009.08197}
 }
 \seealso{
 \code{\link[=gof_models]{gof_models()}}, \code{\link[=fit_model]{fit_model()}}, \code{\link[=sim_path]{sim_path()}} for general path

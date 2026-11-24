@@ -42,9 +42,13 @@ private, a GitHub token is needed: `usethis::create_github_token()`, then
 | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 | `"wiener_power"` | Wiener, trend `mu t^r` | `mu`, `sigma`, `r` |
 | `"gamma_power"` | gamma, shape function `a t^r` | `a`, `b`, `r` |
+| `"ig_re"` | inverse Gaussian, one rate per unit (Wang and Xu, 2010) | `xi`, `sd_delta`, `eta` |
 
-`gof_models()` gives the law of the increments of each model. Any other model
-(general path model, random effects, ...) can be tested with `custom_model()`.
+`gof_models()` gives the law of the increments of each model. In the first
+seven models all the units follow the same process; in `"ig_re"` each unit
+degrades at its own mean rate, drawn from a common distribution. Any other
+model (general path model, other random effects, ...) can be tested with
+`custom_model()`.
 
 ## Getting started
 
@@ -72,7 +76,11 @@ matrix with one row per trajectory and the times in `t`:
 laser <- SMRD.data::gaaslaser
 laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
 set.seed(30)
-gof_test(laser, "wiener")
+gof_test(laser, "wiener")   # rejected, as in Zheng et al. (2026)
+
+# The lasers degrade at different rates: one rate per laser
+set.seed(30)
+gof_test(laser, "ig_re")    # not rejected
 ```
 
 ## Level and power
@@ -95,7 +103,7 @@ power_study(function() sim_path(0:50, "linear", phi_mean = 0.2, phi_sd = 0.05,
 | `gof_test()` | goodness-of-fit test of one candidate model |
 | `compare_models()` | tests of several candidate models on the same data |
 | `power_study()` | empirical level or power of the test |
-| `gof_models()` | the seven candidate models |
+| `gof_models()` | the eight candidate models |
 | `fit_model()` | maximum likelihood estimation of a candidate model |
 | `sim_model()` | simulation of a candidate model |
 | `sim_path()` | simulation of general path models |
