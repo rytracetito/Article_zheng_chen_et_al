@@ -9,7 +9,7 @@ similarity_stats(x, pool)
 \arguments{
 \item{x}{Trajectories to test: a numeric matrix with one row per
 trajectory and one column per inspection time, or any data form accepted
-by \code{\link[=gof_data]{gof_data()}} (for instance a \code{levysim} simulation).}
+by \code{\link[=gof_data]{gof_data()}} (for instance a \code{DegradSim} simulation).}
 
 \item{pool}{Pool of simulated trajectories, in the same form as \code{x} and at
 the same inspection times.}

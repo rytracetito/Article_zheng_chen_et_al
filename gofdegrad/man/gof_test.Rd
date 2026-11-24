@@ -16,7 +16,7 @@ gof_test(
 }
 \arguments{
 \item{x}{Degradation data, in any form accepted by \code{\link[=gof_data]{gof_data()}}: result
-of a \code{levysim} simulation, matrix with a column of times, matrix with
+of a \code{DegradSim} simulation, matrix with a column of times, matrix with
 one row per trajectory (with \code{t}), data frame (\code{id}, \code{t}, \code{X}) or list
 of data frames. All the trajectories must share the same inspection
 times, which can be irregular.}
@@ -142,7 +142,7 @@ gof_test(x, "wiener", B = 100, n_pool = 300)
 gof_test(x, "wiener_power", B = 50, n_pool = 300)
 
 # 5. Irregular inspection times common to all the trajectories
-t <- levysim::inspection_times("increasing", n = 20, tmax = 40)$time
+t <- DegradSim::inspection_times("increasing", n = 20, tmax = 40)$time
 x <- sim_model(t, "ig", c(mu = 0.5, eta = 2), n_traj = 8)
 gof_test(x, "ig", B = 100, n_pool = 400)
 

@@ -15,7 +15,7 @@ Cramér-von Mises type similarity measures, and calibrates the decision by
 parametric bootstrap. The trajectories must share the same inspection times,
 which can be irregular.
 
-The simulations rely on the package `levysim` and the maximum likelihood
+The simulations rely on the package `DegradSim` and the maximum likelihood
 estimators on the package `levyfit`
 (<https://github.com/rytracetito/levy_packages>).
 
@@ -26,7 +26,7 @@ estimators on the package `levyfit`
 remotes::install_github("rytracetito/Article_zheng_chen_et_al", subdir = "gofdegrad")
 ```
 
-The dependencies `levysim` and `levyfit` are installed from GitHub at the same
+The dependencies `DegradSim` and `levyfit` are installed from GitHub at the same
 time (field `Remotes` of the `DESCRIPTION` file). If the repositories are
 private, a GitHub token is needed: `usethis::create_github_token()`, then
 `gitcreds::gitcreds_set()`.
@@ -54,7 +54,7 @@ library(gofdegrad)
 # 1. Data: six gamma trajectories inspected every time unit
 set.seed(1)
 x <- sim_model(0:50, "gamma", c(a = 2, b = 3), n_traj = 6)
-levysim::plot_traj(x)
+DegradSim::plot_traj(x)
 
 # 2. Test of the gamma model (B = 1000 bootstrap samples, pools of 600 trajectories)
 res <- gof_test(x, "gamma")

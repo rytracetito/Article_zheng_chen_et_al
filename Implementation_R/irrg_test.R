@@ -13,7 +13,7 @@ L  <- 200
 # titre : Nom du modèle
 # x : data (simulation de sim_model ou de sim_path)
 tracer <- function(x, titre) {
-  df <- levysim::traj_df(x)
+  df <- DegradSim::traj_df(x)
   ggplot(df, aes(t, X, group = id)) +
     geom_line(colour = "#2563EB", linewidth = 0.5, alpha = 0.8) +
     geom_rug(data = data.frame(t = unique(df$t)), aes(x = t), inherit.aes = FALSE,

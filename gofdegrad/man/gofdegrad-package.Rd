@@ -55,7 +55,7 @@ frame by \link[=as.data.frame.gof_test]{as.data.frame()} and plotted by
 
 
 The first five are Lévy processes, estimated with the package \code{levyfit}
-and simulated with the package \code{levysim}; \code{\link[=gof_models]{gof_models()}} gives the law
+and simulated with the package \code{DegradSim}; \code{\link[=gof_models]{gof_models()}} gives the law
 of their increments. Any other model, for instance a general path model,
 can be tested with \code{\link[=custom_model]{custom_model()}}.
 }
@@ -65,7 +65,7 @@ can be tested with \code{\link[=custom_model]{custom_model()}}.
 A test always follows the same three steps.
 \enumerate{
 \item \strong{Prepare the data}: all the trajectories must be inspected at the
-same times. Simulated data from \code{levysim} or \code{\link[=sim_model]{sim_model()}} can be used
+same times. Simulated data from \code{DegradSim} or \code{\link[=sim_model]{sim_model()}} can be used
 directly; real data can be given as a data frame with the columns
 \code{id} (trajectory), \code{t} (time) and \code{X} (degradation level), or as a
 matrix with one row per trajectory and the times in \code{t} (see
@@ -101,7 +101,7 @@ See \code{\link[=gof_test]{gof_test()}} for the details.
 # 1. Data: six trajectories of a gamma process, inspected every time unit
 set.seed(1)
 x <- sim_model(0:30, "gamma", c(a = 2, b = 3), n_traj = 6)
-levysim::plot_traj(x)
+DegradSim::plot_traj(x)
 
 # 2. Test of the gamma model (small B to keep the example fast)
 res <- gof_test(x, "gamma", B = 100, n_pool = 300)
@@ -129,7 +129,7 @@ Useful links:
 \itemize{
 \item \url{https://github.com/rytracetito/Article_zheng_chen_et_al}
 \item Report bugs at \url{https://github.com/rytracetito/Article_zheng_chen_et_al/issues}
-\item The packages \code{levysim} (simulation) and \code{levyfit} (estimation):
+\item The packages \code{DegradSim} (simulation) and \code{levyfit} (estimation):
 \url{https://github.com/rytracetito/levy_packages}
 }
 }

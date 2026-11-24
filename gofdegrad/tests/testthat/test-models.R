@@ -15,11 +15,11 @@ test_that("gof_models lists the seven models", {
   expect_equal(g$increasing, c(FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE))
 })
 
-test_that("sim_model returns levysim matrices starting at 0", {
+test_that("sim_model returns DegradSim matrices starting at 0", {
   set.seed(1)
   for (m in names(true_theta)) {
     x <- sim_model(c(0, 1, 2.5, 4), m, true_theta[[m]], n_traj = 3)
-    expect_s3_class(x, "levysim")
+    expect_s3_class(x, "DegradSim")
     expect_equal(dim(x), c(4, 4))
     expect_equal(unname(x[1, -1]), c(0, 0, 0))
     expect_true(all(is.finite(x)))

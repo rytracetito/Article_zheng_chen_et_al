@@ -16,7 +16,7 @@ compare_models(
 }
 \arguments{
 \item{x}{Degradation data, in any form accepted by \code{\link[=gof_data]{gof_data()}}: result
-of a \code{levysim} simulation, matrix with a column of times, matrix with
+of a \code{DegradSim} simulation, matrix with a column of times, matrix with
 one row per trajectory (with \code{t}), data frame (\code{id}, \code{t}, \code{X}) or list
 of data frames. All the trajectories must share the same inspection
 times, which can be irregular.}

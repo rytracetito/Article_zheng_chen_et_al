@@ -8,7 +8,7 @@
 #' once to the observed data and once to each bootstrap sample.
 #'
 #' @param x Degradation data, in any form accepted by [gof_data()]: result
-#'   of a `levysim` simulation, matrix with a column of times, matrix with
+#'   of a `DegradSim` simulation, matrix with a column of times, matrix with
 #'   one row per trajectory (with `t`), data frame (`id`, `t`, `X`) or list
 #'   of data frames.
 #' @param model Name of the model, one of `"wiener"`, `"gamma"`, `"ig"`,
@@ -80,7 +80,7 @@
 #' fit_model(x, "wiener")
 #'
 #' # 3. Irregular inspection times (common to all the trajectories)
-#' t <- levysim::inspection_times("increasing", n = 30, tmax = 50)$time
+#' t <- DegradSim::inspection_times("increasing", n = 30, tmax = 50)$time
 #' x <- sim_model(t, "wiener_power", c(mu = 0.5, sigma = 0.3, r = 0.6), n_traj = 10)
 #' fit_model(x, "wiener_power")
 #'
@@ -141,36 +141,43 @@ check_estimate <- function(est, mod) {
 #' @param n_traj Number of trajectories (default 1).
 #'
 #' @details
-#' The five Lévy models and the two power-law models are simulated by the
-#' package `levysim` (exact simulation of the independent increments), except
-#' the Meixner model: [levysim::sim_meixner()] draws the increments one at a
-#' time, which is too slow for the thousands of trajectories of a bootstrap.
-#' The Meixner increments of a same time step are therefore drawn together,
-#' with the same law (numerical inversion of the distribution function with
-#' `Runuran`, parameters \eqn{a}, \eqn{b}, \eqn{d \Delta t},
-#' \eqn{m \Delta t}).
+#' All the models are simulated exactly, by drawing their independent
+#' increments at the inspection times and cumulating them.
+#' * Wiener, gamma, inverse Gaussian and variance-gamma: package `DegradSim`;
+#'   the power-law gamma model is the gamma process time-scaled by
+#'   \eqn{A(t) = a t^r}, also simulated by [DegradSim::sim_gamma()].
+#' * Power-law Wiener: Gaussian increments of mean
+#'   \eqn{\mu (t_j^r - t_{j-1}^r)} and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
+#'   It is not the time-scaled Wiener process \eqn{Y_{A(t)}} of `DegradSim`,
+#'   whose time scale changes both the mean and the variance.
+#' * Meixner: [DegradSim::sim_meixner()] draws the increments one at a time,
+#'   which is too slow for the thousands of trajectories of a bootstrap. The
+#'   Meixner increments of a same time step are therefore drawn together, with
+#'   the same law (numerical inversion of the distribution function with
+#'   `Runuran`, parameters \eqn{a}, \eqn{b}, \eqn{d \Delta t},
+#'   \eqn{m \Delta t}).
 #'
 #' The parametrizations are those of [gof_models()]: in particular the gamma
-#' model uses the **rate** \eqn{b}, as in `levysim` and `levyfit`.
+#' model uses the **rate** \eqn{b}, as in `DegradSim` and `levyfit`.
 #'
-#' @return An object of class `levysim`: a matrix whose first column `t`
+#' @return An object of class `DegradSim`: a matrix whose first column `t`
 #'   contains the inspection times (time 0 included) and the columns `X1`,
 #'   ..., `Xn` the simulated levels, equal to 0 at time 0. It can be plotted
-#'   with [levysim::plot_traj()], converted to a data frame with
-#'   [levysim::traj_df()], and given directly to [fit_model()] and
+#'   with [DegradSim::plot_traj()], converted to a data frame with
+#'   [DegradSim::traj_df()], and given directly to [fit_model()] and
 #'   [gof_test()].
 #'
 #' @seealso [gof_models()], [fit_model()], [sim_path()] for general path
-#'   models, and the package `levysim` for more simulation options
-#'   (different inspection times per trajectory, other time
-#'   transformations).
+#'   models, and the package `DegradSim` for more simulation options
+#'   (different inspection times per trajectory, other time-scaling
+#'   functions, other processes).
 #'
 #' @examples
 #' # 1. Ten trajectories of a Wiener process, inspected every 0.5 time unit
 #' set.seed(1)
 #' x <- sim_model(seq(0, 10, by = 0.5), "wiener", c(mu = 0.5, sigma = 0.8), n_traj = 10)
 #' x
-#' levysim::plot_traj(x)
+#' DegradSim::plot_traj(x)
 #'
 #' # 2. The seven models, with the same inspection times
 #' t <- 0:20
@@ -182,16 +189,16 @@ check_estimate <- function(est, mod) {
 #' sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
 #'
 #' # 3. Irregular inspection times, more and more frequent
-#' t <- levysim::inspection_times("increasing", n = 25, tmax = 50)$time
+#' t <- DegradSim::inspection_times("increasing", n = 25, tmax = 50)$time
 #' x <- sim_model(t, "gamma", c(a = 2, b = 3), n_traj = 8)
-#' levysim::plot_traj(x, "Gamma process, irregular inspections")
+#' DegradSim::plot_traj(x, "Gamma process, irregular inspections")
 #'
 #' # 4. Simulate from estimated parameters (parametric bootstrap)
 #' theta <- fit_model(x, "gamma")
 #' y <- sim_model(t, "gamma", theta, n_traj = 8)
 #'
 #' # 5. All the data in one data frame, for instance to save them
-#' head(levysim::traj_df(y))
+#' head(DegradSim::traj_df(y))
 #' @export
 sim_model <- function(t, model, theta, n_traj = 1) {
   mod <- get_model(model)
@@ -201,7 +208,7 @@ sim_model <- function(t, model, theta, n_traj = 1) {
   if (length(t) == 0 || any(diff(t) <= 0)) stop("inspection times must be strictly increasing")
   if (!is.numeric(n_traj) || length(n_traj) != 1 || n_traj < 1) stop("n_traj must be a positive integer")
   X <- simulate_levels(mod, theta, t, n_traj)
-  as_levysim(X, t, mod$name, theta)
+  as_degradsim(X, t, mod$name, theta)
 }
 
 simulate_levels <- function(mod, theta, t, n) {
@@ -214,12 +221,13 @@ simulate_levels <- function(mod, theta, t, n) {
   X
 }
 
-as_levysim <- function(X, t, model, parameters) {
+as_degradsim <- function(X, t, model, parameters) {
   out <- cbind(t = c(0, t), rbind(0, t(X)))
   colnames(out) <- c("t", paste0("X", seq_len(nrow(X))))
-  class(out) <- c("levysim", "matrix", "array")
+  class(out) <- c("DegradSim", "matrix", "array")
   attr(out, "model") <- model
   attr(out, "parameters") <- unlist(parameters)
+  attr(out, "method") <- "exact simulation of the increments (gofdegrad)"
   out
 }
 
@@ -305,12 +313,13 @@ as_levysim <- function(X, t, model, parameters) {
 #'     c(mu = mu, sigma = sqrt(mean((dX - mu * dL)^2 / dT)))
 #'   },
 #'   simulate = function(theta, t, n) {
-#'     x <- levysim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]],
-#'                              Lambda = Lambda, tau = tau, n_traj = n)
-#'     gof_data(x)$X
+#'     dL <- matrix(diff(Lambda(c(0, t))), n, length(t), byrow = TRUE)
+#'     dT <- matrix(diff(tau(c(0, t))), n, length(t), byrow = TRUE)
+#'     dX <- theta[["mu"]] * dL + theta[["sigma"]] * sqrt(dT) * matrix(stats::rnorm(n * length(t)), n)
+#'     t(apply(dX, 1, cumsum))
 #'   }
 #' )
-#' t <- levysim::inspection_times("increasing", n = 29, tmax = 35, digits = 2)$time
+#' t <- DegradSim::inspection_times("increasing", n = 29, tmax = 35, digits = 2)$time
 #' y <- sim_model(t, wiener_tt, c(mu = 2, sigma = 0.78), n_traj = 6)
 #' fit_model(y, wiener_tt)
 #' gof_test(y, wiener_tt, B = 50, n_pool = 300)

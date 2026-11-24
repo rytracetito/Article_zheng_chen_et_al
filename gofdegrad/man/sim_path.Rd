@@ -33,10 +33,10 @@ by \code{shape = "exponential"}.}
 \item{n_traj}{Number of trajectories (default 1).}
 }
 \value{
-An object of class \code{levysim}: a matrix whose first column \code{t}
+An object of class \code{DegradSim}: a matrix whose first column \code{t}
 contains the inspection times (time 0 included) and the columns \code{X1},
 ..., \code{Xn} the simulated levels. It can be plotted with
-\code{\link[levysim:plot_traj]{levysim::plot_traj()}} and given to \code{\link[=fit_model]{fit_model()}} and \code{\link[=gof_test]{gof_test()}}.
+\code{\link[DegradSim:plot_traj]{DegradSim::plot_traj()}} and given to \code{\link[=fit_model]{fit_model()}} and \code{\link[=gof_test]{gof_test()}}.
 }
 \description{
 Simulates trajectories of a general path model (Algorithm 3 of Zheng et
@@ -68,22 +68,22 @@ set.seed(1)
 
 # 1. Linear paths with random slopes
 x <- sim_path(t, "linear", phi_mean = 0.2, phi_sd = 0.05, sigma_eps = 0.1, n_traj = 6)
-levysim::plot_traj(x)
+DegradSim::plot_traj(x)
 
 # 2. Power paths: concave when phi_2 < 1
 x <- sim_path(t, "power", phi_mean = c(1, 0.5), phi_sd = c(0.2, 0.05),
               sigma_eps = 0.1, n_traj = 6)
-levysim::plot_traj(x, "Power paths")
+DegradSim::plot_traj(x, "Power paths")
 
 # 3. Exponential paths
 x <- sim_path(t, "exponential", phi_mean = 0.2, phi_sd = 0.05, sigma_eps = 0.1,
               omega = 0.05, n_traj = 6)
-levysim::plot_traj(x, "Exponential paths")
+DegradSim::plot_traj(x, "Exponential paths")
 
 # 4. Irregular inspection times
-t <- levysim::inspection_times("dec-inc", n = 20, tmax = 50)$time
+t <- DegradSim::inspection_times("dec-inc", n = 20, tmax = 50)$time
 x <- sim_path(t, "linear", phi_mean = 0.2, phi_sd = 0.05, sigma_eps = 0.1, n_traj = 6)
-head(levysim::traj_df(x))
+head(DegradSim::traj_df(x))
 
 # 5. Is a linear path model with random slopes taken for a Wiener process?
 gof_test(x, "wiener", B = 50, n_pool = 200)

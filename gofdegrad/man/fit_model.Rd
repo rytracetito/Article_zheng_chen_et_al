@@ -8,7 +8,7 @@ fit_model(x, model, t = NULL)
 }
 \arguments{
 \item{x}{Degradation data, in any form accepted by \code{\link[=gof_data]{gof_data()}}: result
-of a \code{levysim} simulation, matrix with a column of times, matrix with
+of a \code{DegradSim} simulation, matrix with a column of times, matrix with
 one row per trajectory (with \code{t}), data frame (\code{id}, \code{t}, \code{X}) or list
 of data frames.}
 
@@ -85,7 +85,7 @@ fit_model(x, "ig")
 fit_model(x, "wiener")
 
 # 3. Irregular inspection times (common to all the trajectories)
-t <- levysim::inspection_times("increasing", n = 30, tmax = 50)$time
+t <- DegradSim::inspection_times("increasing", n = 30, tmax = 50)$time
 x <- sim_model(t, "wiener_power", c(mu = 0.5, sigma = 0.3, r = 0.6), n_traj = 10)
 fit_model(x, "wiener_power")
 

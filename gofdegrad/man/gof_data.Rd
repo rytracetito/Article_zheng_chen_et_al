@@ -9,17 +9,17 @@ gof_data(x, t = NULL)
 \arguments{
 \item{x}{Degradation data, in one of the following forms:
 \itemize{
-\item the result of a simulation function of the package \code{levysim} (for
-instance \code{levysim::sim_gamma()}), of \code{\link[=sim_model]{sim_model()}} or of \code{\link[=sim_path]{sim_path()}};
+\item the result of a simulation function of the package \code{DegradSim} (for
+instance \code{DegradSim::sim_gamma()}), of \code{\link[=sim_model]{sim_model()}} or of \code{\link[=sim_path]{sim_path()}};
 \item a numeric matrix whose first column contains the inspection times and
 the other columns the degradation levels of the trajectories (the
-format of \code{levysim} and \code{levyfit}), when \code{t} is not given;
+format of \code{DegradSim} and \code{levyfit}), when \code{t} is not given;
 \item a numeric matrix with one row per trajectory and one column per
 inspection time, when \code{t} is given;
 \item a numeric vector of degradation levels of one trajectory, with \code{t};
 \item a data frame with the columns \code{id} (trajectory), \code{t} (inspection time)
 and \code{X} (degradation level), in any row order, for instance read from
-a csv file or returned by \code{levysim::traj_df()}; the trajectories are
+a csv file or returned by \code{DegradSim::traj_df()}; the trajectories are
 sorted by \code{id};
 \item a list of data frames, one per trajectory, whose first column contains
 the inspection times and second column the degradation levels.
@@ -58,9 +58,9 @@ time 0: the first increment goes from 0 at time 0 to the first observed
 level, and it weighs on the estimation of the models.
 }
 \examples{
-# 1. Simulated data from levysim: a matrix with the column t
+# 1. Simulated data from DegradSim: a matrix with the column t
 set.seed(1)
-x <- levysim::sim_gamma(seq(0, 10, by = 1), a = 2, b = 3, n_traj = 4)
+x <- DegradSim::sim_gamma(seq(0, 10, by = 1), a = 2, b = 3, n_traj = 4)
 d <- gof_data(x)
 d
 d$t

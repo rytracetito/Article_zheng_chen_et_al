@@ -9,17 +9,17 @@
 #' before a test.
 #'
 #' @param x Degradation data, in one of the following forms:
-#'   * the result of a simulation function of the package `levysim` (for
-#'     instance `levysim::sim_gamma()`), of [sim_model()] or of [sim_path()];
+#'   * the result of a simulation function of the package `DegradSim` (for
+#'     instance `DegradSim::sim_gamma()`), of [sim_model()] or of [sim_path()];
 #'   * a numeric matrix whose first column contains the inspection times and
 #'     the other columns the degradation levels of the trajectories (the
-#'     format of `levysim` and `levyfit`), when `t` is not given;
+#'     format of `DegradSim` and `levyfit`), when `t` is not given;
 #'   * a numeric matrix with one row per trajectory and one column per
 #'     inspection time, when `t` is given;
 #'   * a numeric vector of degradation levels of one trajectory, with `t`;
 #'   * a data frame with the columns `id` (trajectory), `t` (inspection time)
 #'     and `X` (degradation level), in any row order, for instance read from
-#'     a csv file or returned by `levysim::traj_df()`; the trajectories are
+#'     a csv file or returned by `DegradSim::traj_df()`; the trajectories are
 #'     sorted by `id`;
 #'   * a list of data frames, one per trajectory, whose first column contains
 #'     the inspection times and second column the degradation levels.
@@ -47,9 +47,9 @@
 #' @seealso [gof_test()], [fit_model()]
 #'
 #' @examples
-#' # 1. Simulated data from levysim: a matrix with the column t
+#' # 1. Simulated data from DegradSim: a matrix with the column t
 #' set.seed(1)
-#' x <- levysim::sim_gamma(seq(0, 10, by = 1), a = 2, b = 3, n_traj = 4)
+#' x <- DegradSim::sim_gamma(seq(0, 10, by = 1), a = 2, b = 3, n_traj = 4)
 #' d <- gof_data(x)
 #' d
 #' d$t

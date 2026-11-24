@@ -89,12 +89,13 @@ wiener_tt <- custom_model(
     c(mu = mu, sigma = sqrt(mean((dX - mu * dL)^2 / dT)))
   },
   simulate = function(theta, t, n) {
-    x <- levysim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]],
-                             Lambda = Lambda, tau = tau, n_traj = n)
-    gof_data(x)$X
+    dL <- matrix(diff(Lambda(c(0, t))), n, length(t), byrow = TRUE)
+    dT <- matrix(diff(tau(c(0, t))), n, length(t), byrow = TRUE)
+    dX <- theta[["mu"]] * dL + theta[["sigma"]] * sqrt(dT) * matrix(stats::rnorm(n * length(t)), n)
+    t(apply(dX, 1, cumsum))
   }
 )
-t <- levysim::inspection_times("increasing", n = 29, tmax = 35, digits = 2)$time
+t <- DegradSim::inspection_times("increasing", n = 29, tmax = 35, digits = 2)$time
 y <- sim_model(t, wiener_tt, c(mu = 2, sigma = 0.78), n_traj = 6)
 fit_model(y, wiener_tt)
 gof_test(y, wiener_tt, B = 50, n_pool = 300)

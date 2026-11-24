@@ -21,7 +21,7 @@ test_that("with one trajectory the sup and sum statistics are equal", {
   expect_equal(s[["CvM_sup"]], s[["CvM_sum"]])
 })
 
-test_that("similarity_stats accepts levysim objects", {
+test_that("similarity_stats accepts DegradSim objects", {
   set.seed(3)
   x <- sim_model(0:10, "gamma", c(a = 2, b = 3), n_traj = 3)
   pool <- sim_model(0:10, "gamma", c(a = 2, b = 3), n_traj = 50)

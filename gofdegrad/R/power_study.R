@@ -92,7 +92,7 @@
 #' head(p$rejections)
 #'
 #' # 7. Level with irregular inspection times and a progress bar
-#' t_irr <- levysim::inspection_times("dec-inc", n = 15, tmax = 20)$time
+#' t_irr <- DegradSim::inspection_times("dec-inc", n = 15, tmax = 20)$time
 #' power_study(function() sim_model(t_irr, "ig", c(mu = 0.5, eta = 2), n_traj = 4),
 #'             model = "ig", n_rep = 10, B = 30, n_pool = 150, progress = TRUE)
 #' @export

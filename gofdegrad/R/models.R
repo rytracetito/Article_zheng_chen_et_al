@@ -4,56 +4,56 @@ model_catalogue <- function() {
       process = "Wiener", parameters = c("mu", "sigma"), increasing = FALSE,
       law = "X(t) - X(s) ~ N(mu (t - s), sigma^2 (t - s))",
       estimation = "levyfit::wiener_mle(), closed form",
-      simulation = "levysim::sim_wiener()",
+      simulation = "DegradSim::sim_wiener()",
       fit = function(d) {
         inc <- increments_of(d)
         e <- levyfit::wiener_mle(levyfit::increments_data(as.vector(inc$dX), as.vector(inc$dt)))
         c(mu = e[["mu"]], sigma = sqrt(e[["sigma2"]]))
       },
       simulate = function(theta, t, n) {
-        levels_of(levysim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]], n_traj = n))
+        levels_of(DegradSim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]], n_traj = n))
       }
     ),
     gamma = list(
       process = "gamma", parameters = c("a", "b"), increasing = TRUE,
       law = "X(t) - X(s) ~ Gamma(shape a (t - s), rate b)",
       estimation = "levyfit::gamma_mle(), root of one equation",
-      simulation = "levysim::sim_gamma()",
+      simulation = "DegradSim::sim_gamma()",
       fit = function(d) {
         inc <- positive_increments(d, "gamma")
         e <- levyfit::gamma_mle(levyfit::increments_data(as.vector(inc$dX), as.vector(inc$dt)))
         c(a = e[["a"]], b = e[["b"]])
       },
       simulate = function(theta, t, n) {
-        levels_of(levysim::sim_gamma(c(0, t), a = theta[["a"]], b = theta[["b"]], n_traj = n))
+        levels_of(DegradSim::sim_gamma(c(0, t), a = theta[["a"]], b = theta[["b"]], n_traj = n))
       }
     ),
     ig = list(
       process = "inverse Gaussian", parameters = c("mu", "eta"), increasing = TRUE,
       law = "X(t) - X(s) ~ IG(mean mu (t - s), shape eta (t - s)^2)",
       estimation = "levyfit::ig_mle(), closed form",
-      simulation = "levysim::sim_ig()",
+      simulation = "DegradSim::sim_ig()",
       fit = function(d) {
         inc <- positive_increments(d, "inverse Gaussian")
         e <- levyfit::ig_mle(levyfit::increments_data(as.vector(inc$dX), as.vector(inc$dt)))
         c(mu = e[["mu"]], eta = e[["eta"]])
       },
       simulate = function(theta, t, n) {
-        levels_of(levysim::sim_ig(c(0, t), mu = theta[["mu"]], eta = theta[["eta"]], n_traj = n))
+        levels_of(DegradSim::sim_ig(c(0, t), mu = theta[["mu"]], eta = theta[["eta"]], n_traj = n))
       }
     ),
     vg = list(
       process = "variance-gamma", parameters = c("theta", "sigma", "nu"), increasing = FALSE,
       law = "X(s) = theta G(s) + sigma W(G(s)), G gamma process of mean s and variance nu s",
       estimation = "levyfit::vg_mle(), EM algorithm then L-BFGS-B",
-      simulation = "levysim::sim_vg()",
+      simulation = "DegradSim::sim_vg()",
       fit = function(d) {
         inc <- increments_of(d)
         e <- levyfit::vg_mle(levyfit::increments_data(as.vector(inc$dX), as.vector(inc$dt)))
         c(theta = e[["theta"]], sigma = e[["sigma"]], nu = e[["nu"]])
       },
       simulate = function(theta, t, n) {
-        levels_of(levysim::sim_vg(c(0, t), theta = theta[["theta"]], sigma = theta[["sigma"]],
+        levels_of(DegradSim::sim_vg(c(0, t), theta = theta[["theta"]], sigma = theta[["sigma"]],
                                   nu = theta[["nu"]], n_traj = n))
       }
     ),
@@ -61,7 +61,7 @@ model_catalogue <- function() {
       process = "Meixner", parameters = c("a", "b", "d", "m"), increasing = FALSE,
       law = "X(t) - X(s) ~ Meixner(a, b, d (t - s), m (t - s))",
       estimation = "levyfit::meixner_mle(), profile likelihood",
-      simulation = "numerical inversion (Runuran), same law as levysim::sim_meixner()",
+      simulation = "numerical inversion (Runuran), same law as DegradSim::sim_meixner()",
       fit = function(d) {
         inc <- increments_of(d)
         e <- levyfit::meixner_mle(levyfit::increments_data(as.vector(inc$dX), as.vector(inc$dt)))
@@ -73,24 +73,20 @@ model_catalogue <- function() {
       process = "Wiener with power-law trend", parameters = c("mu", "sigma", "r"), increasing = FALSE,
       law = "X(t) - X(s) ~ N(mu (t^r - s^r), sigma^2 (t - s))",
       estimation = "closed form for (mu, sigma) given r, profile likelihood in r",
-      simulation = "levysim::sim_wiener() with Lambda(t) = t^r",
+      simulation = "exact Gaussian increments, mean mu (t^r - s^r), variance sigma^2 (t - s)",
       fit = function(d) fit_wiener_power(d),
-      simulate = function(theta, t, n) {
-        r <- theta[["r"]]
-        levels_of(levysim::sim_wiener(c(0, t), mu = theta[["mu"]], sigma = theta[["sigma"]],
-                                      Lambda = function(s) s^r, n_traj = n))
-      }
+      simulate = function(theta, t, n) sim_wiener_power_levels(theta, t, n)
     ),
     gamma_power = list(
       process = "gamma with power-law shape function", parameters = c("a", "b", "r"), increasing = TRUE,
       law = "X(t) - X(s) ~ Gamma(shape a (t^r - s^r), rate b)",
       estimation = "levyfit::gamma_mle() given r, profile likelihood in r",
-      simulation = "levysim::sim_gamma() with A(t) = t^r",
+      simulation = "DegradSim::sim_gamma() with A(t) = a t^r",
       fit = function(d) fit_gamma_power(d),
       simulate = function(theta, t, n) {
+        a <- theta[["a"]]
         r <- theta[["r"]]
-        levels_of(levysim::sim_gamma(c(0, t), a = theta[["a"]], b = theta[["b"]],
-                                     A = function(s) s^r, n_traj = n))
+        levels_of(DegradSim::sim_gamma(c(0, t), b = theta[["b"]], A = function(s) a * s^r, n_traj = n))
       }
     )
   )
@@ -218,6 +214,16 @@ sim_meixner_levels <- function(theta, t, n) {
     gen <- Runuran::pinvd.new(Runuran::udmeixner(alpha = a, beta = b, delta = d * s, mu = m * s))
     dX[, cols] <- Runuran::ur(gen, n * length(cols))
   }
+  cumulate(dX)
+}
+
+sim_wiener_power_levels <- function(theta, t, n) {
+  if (theta[["sigma"]] <= 0) stop("sigma must be positive")
+  if (theta[["r"]] <= 0) stop("r must be positive")
+  dL <- diff(c(0, t)^theta[["r"]])
+  dt <- diff(c(0, t))
+  dX <- matrix(stats::rnorm(n * length(t)), n, length(t)) * matrix(theta[["sigma"]] * sqrt(dt), n, length(t), byrow = TRUE) +
+    matrix(theta[["mu"]] * dL, n, length(t), byrow = TRUE)
   cumulate(dX)
 }
 

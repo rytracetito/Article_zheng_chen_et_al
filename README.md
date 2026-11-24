@@ -10,7 +10,7 @@ https://doi.org/10.1002/qre.70382
 ## Contenu
 
 - `gofdegrad/` : package R du test d'adéquation (version 1.0.0), fondé sur les
-  packages `levysim` (simulation) et `levyfit` (estimation)
+  packages `DegradSim` (simulation) et `levyfit` (estimation)
 - `manuel/gofdegrad.pdf` : manuel de référence du package
 - `Implementation_R/` : scripts d'utilisation du package (grilles régulière et
   irrégulière, applications aux données GaAs laser, résistances, usure, Hudak)
@@ -26,6 +26,6 @@ https://doi.org/10.1002/qre.70382
 remotes::install_github("rytracetito/Article_zheng_chen_et_al", subdir = "gofdegrad")
 ```
 
-Les dépendances `levysim` et `levyfit` sont installées en même temps depuis
+Les dépendances `DegradSim` et `levyfit` sont installées en même temps depuis
 GitHub. Si les dépôts sont privés, un jeton GitHub est nécessaire
 (`usethis::create_github_token()` puis `gitcreds::gitcreds_set()`).

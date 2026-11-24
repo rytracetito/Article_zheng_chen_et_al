@@ -56,7 +56,7 @@ xl <- sim_path(t, "linear", phi_mean = 0.2, phi_sd = 0.05, sigma_eps = 0.05, n_t
 xp <- sim_path(t, "power", phi_mean = c(0.2, 1.2), phi_sd = c(0.02, 0.05), sigma_eps = 0.05, n_traj = 6)
 xe <- sim_path(t, "exponential", phi_mean = 0.5, phi_sd = 0.05, sigma_eps = 0.05, omega = 0.03, n_traj = 6)
 ok("trajectoires generales lineaire, puissance et exponentielle simulees")
-print(levysim::plot_traj(sim_model(t, "gamma", vrais$gamma, n_traj = 6), "Gamma"))
+print(DegradSim::plot_traj(sim_model(t, "gamma", vrais$gamma, n_traj = 6), "Gamma"))
 ok("graphique affiche dans l'onglet Plots")
 
 # ---------------------------------------------------------------------

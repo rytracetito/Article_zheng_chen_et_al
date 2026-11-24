@@ -47,14 +47,14 @@
 #' | `"gamma_power"` | gamma, shape function \eqn{a t^r} | `a`, `b`, `r` |
 #'
 #' The first five are Lévy processes, estimated with the package `levyfit`
-#' and simulated with the package `levysim`; [gof_models()] gives the law
+#' and simulated with the package `DegradSim`; [gof_models()] gives the law
 #' of their increments. Any other model, for instance a general path model,
 #' can be tested with [custom_model()].
 #'
 #' @section Getting started:
 #' A test always follows the same three steps.
 #' 1. **Prepare the data**: all the trajectories must be inspected at the
-#'    same times. Simulated data from `levysim` or [sim_model()] can be used
+#'    same times. Simulated data from `DegradSim` or [sim_model()] can be used
 #'    directly; real data can be given as a data frame with the columns
 #'    `id` (trajectory), `t` (time) and `X` (degradation level), or as a
 #'    matrix with one row per trajectory and the times in `t` (see
@@ -99,14 +99,14 @@
 #' Useful links:
 #' * <https://github.com/rytracetito/Article_zheng_chen_et_al>
 #' * Report bugs at <https://github.com/rytracetito/Article_zheng_chen_et_al/issues>
-#' * The packages `levysim` (simulation) and `levyfit` (estimation):
+#' * The packages `DegradSim` (simulation) and `levyfit` (estimation):
 #'   <https://github.com/rytracetito/levy_packages>
 #'
 #' @examples
 #' # 1. Data: six trajectories of a gamma process, inspected every time unit
 #' set.seed(1)
 #' x <- sim_model(0:30, "gamma", c(a = 2, b = 3), n_traj = 6)
-#' levysim::plot_traj(x)
+#' DegradSim::plot_traj(x)
 #'
 #' # 2. Test of the gamma model (small B to keep the example fast)
 #' res <- gof_test(x, "gamma", B = 100, n_pool = 300)

@@ -10,7 +10,7 @@
 #'
 #' @param x Trajectories to test: a numeric matrix with one row per
 #'   trajectory and one column per inspection time, or any data form accepted
-#'   by [gof_data()] (for instance a `levysim` simulation).
+#'   by [gof_data()] (for instance a `DegradSim` simulation).
 #' @param pool Pool of simulated trajectories, in the same form as `x` and at
 #'   the same inspection times.
 #'
@@ -71,7 +71,7 @@ similarity_stats <- function(x, pool) {
 }
 
 as_level_matrix <- function(x) {
-  if (is.matrix(x) && !inherits(x, "levysim")) {
+  if (is.matrix(x) && !inherits(x, "DegradSim")) {
     if (!is.numeric(x)) stop("the trajectories must be numeric")
     return(x)
   }

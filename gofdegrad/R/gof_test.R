@@ -9,7 +9,7 @@
 #' obtained by parametric bootstrap.
 #'
 #' @param x Degradation data, in any form accepted by [gof_data()]: result
-#'   of a `levysim` simulation, matrix with a column of times, matrix with
+#'   of a `DegradSim` simulation, matrix with a column of times, matrix with
 #'   one row per trajectory (with `t`), data frame (`id`, `t`, `X`) or list
 #'   of data frames. All the trajectories must share the same inspection
 #'   times, which can be irregular.
@@ -127,7 +127,7 @@
 #' gof_test(x, "wiener_power", B = 50, n_pool = 300)
 #'
 #' # 5. Irregular inspection times common to all the trajectories
-#' t <- levysim::inspection_times("increasing", n = 20, tmax = 40)$time
+#' t <- DegradSim::inspection_times("increasing", n = 20, tmax = 40)$time
 #' x <- sim_model(t, "ig", c(mu = 0.5, eta = 2), n_traj = 8)
 #' gof_test(x, "ig", B = 100, n_pool = 400)
 #'

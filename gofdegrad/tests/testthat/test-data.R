@@ -6,8 +6,8 @@ test_that("gof_data gives the same result for all the data forms", {
   expect_equal(ref$t, c(1, 2.5, 4))
   expect_equal(ref$X, X[, -1])
 
-  levysim_form <- cbind(t = t, X1 = X[1, ], X2 = X[2, ])
-  expect_equal(gof_data(levysim_form), ref)
+  degradsim_form <- cbind(t = t, X1 = X[1, ], X2 = X[2, ])
+  expect_equal(gof_data(degradsim_form), ref)
 
   long <- data.frame(id = rep(1:2, each = 4), t = rep(t, 2), X = c(X[1, ], X[2, ]))
   expect_equal(gof_data(long), ref)
@@ -29,9 +29,9 @@ test_that("gof_data subtracts the level at time 0 and keeps data without time 0"
   expect_equal(as.vector(d$X), c(0.3, 0.8))
 })
 
-test_that("gof_data accepts the results of levysim and of sim_model", {
+test_that("gof_data accepts the results of DegradSim and of sim_model", {
   set.seed(1)
-  x <- levysim::sim_gamma(0:10, a = 2, b = 3, n_traj = 4)
+  x <- DegradSim::sim_gamma(0:10, a = 2, b = 3, n_traj = 4)
   d <- gof_data(x)
   expect_equal(dim(d$X), c(4, 10))
   expect_equal(d$t, 1:10)

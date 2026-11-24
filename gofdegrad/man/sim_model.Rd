@@ -20,11 +20,11 @@ gamma model). The result of \code{\link[=fit_model]{fit_model()}} can be given d
 \item{n_traj}{Number of trajectories (default 1).}
 }
 \value{
-An object of class \code{levysim}: a matrix whose first column \code{t}
+An object of class \code{DegradSim}: a matrix whose first column \code{t}
 contains the inspection times (time 0 included) and the columns \code{X1},
 ..., \code{Xn} the simulated levels, equal to 0 at time 0. It can be plotted
-with \code{\link[levysim:plot_traj]{levysim::plot_traj()}}, converted to a data frame with
-\code{\link[levysim:traj_df]{levysim::traj_df()}}, and given directly to \code{\link[=fit_model]{fit_model()}} and
+with \code{\link[DegradSim:plot_traj]{DegradSim::plot_traj()}}, converted to a data frame with
+\code{\link[DegradSim:traj_df]{DegradSim::traj_df()}}, and given directly to \code{\link[=fit_model]{fit_model()}} and
 \code{\link[=gof_test]{gof_test()}}.
 }
 \description{
@@ -35,24 +35,33 @@ trajectories. This is the simulation step of \code{\link[=gof_test]{gof_test()}}
 generate the bootstrap samples and the pools of simulated trajectories.
 }
 \details{
-The five Lévy models and the two power-law models are simulated by the
-package \code{levysim} (exact simulation of the independent increments), except
-the Meixner model: \code{\link[levysim:sim_meixner]{levysim::sim_meixner()}} draws the increments one at a
-time, which is too slow for the thousands of trajectories of a bootstrap.
-The Meixner increments of a same time step are therefore drawn together,
-with the same law (numerical inversion of the distribution function with
+All the models are simulated exactly, by drawing their independent
+increments at the inspection times and cumulating them.
+\itemize{
+\item Wiener, gamma, inverse Gaussian and variance-gamma: package \code{DegradSim};
+the power-law gamma model is the gamma process time-scaled by
+\eqn{A(t) = a t^r}, also simulated by \code{\link[DegradSim:sim_gamma]{DegradSim::sim_gamma()}}.
+\item Power-law Wiener: Gaussian increments of mean
+\eqn{\mu (t_j^r - t_{j-1}^r)} and variance \eqn{\sigma^2 (t_j - t_{j-1})}.
+It is not the time-scaled Wiener process \eqn{Y_{A(t)}} of \code{DegradSim},
+whose time scale changes both the mean and the variance.
+\item Meixner: \code{\link[DegradSim:sim_meixner]{DegradSim::sim_meixner()}} draws the increments one at a time,
+which is too slow for the thousands of trajectories of a bootstrap. The
+Meixner increments of a same time step are therefore drawn together, with
+the same law (numerical inversion of the distribution function with
 \code{Runuran}, parameters \eqn{a}, \eqn{b}, \eqn{d \Delta t},
 \eqn{m \Delta t}).
+}
 
 The parametrizations are those of \code{\link[=gof_models]{gof_models()}}: in particular the gamma
-model uses the \strong{rate} \eqn{b}, as in \code{levysim} and \code{levyfit}.
+model uses the \strong{rate} \eqn{b}, as in \code{DegradSim} and \code{levyfit}.
 }
 \examples{
 # 1. Ten trajectories of a Wiener process, inspected every 0.5 time unit
 set.seed(1)
 x <- sim_model(seq(0, 10, by = 0.5), "wiener", c(mu = 0.5, sigma = 0.8), n_traj = 10)
 x
-levysim::plot_traj(x)
+DegradSim::plot_traj(x)
 
 # 2. The seven models, with the same inspection times
 t <- 0:20
@@ -64,20 +73,20 @@ sim_model(t, "wiener_power", c(mu = 1, sigma = 0.3, r = 0.5), n_traj = 3)
 sim_model(t, "gamma_power", c(a = 1, b = 2, r = 1.5), n_traj = 3)
 
 # 3. Irregular inspection times, more and more frequent
-t <- levysim::inspection_times("increasing", n = 25, tmax = 50)$time
+t <- DegradSim::inspection_times("increasing", n = 25, tmax = 50)$time
 x <- sim_model(t, "gamma", c(a = 2, b = 3), n_traj = 8)
-levysim::plot_traj(x, "Gamma process, irregular inspections")
+DegradSim::plot_traj(x, "Gamma process, irregular inspections")
 
 # 4. Simulate from estimated parameters (parametric bootstrap)
 theta <- fit_model(x, "gamma")
 y <- sim_model(t, "gamma", theta, n_traj = 8)
 
 # 5. All the data in one data frame, for instance to save them
-head(levysim::traj_df(y))
+head(DegradSim::traj_df(y))
 }
 \seealso{
 \code{\link[=gof_models]{gof_models()}}, \code{\link[=fit_model]{fit_model()}}, \code{\link[=sim_path]{sim_path()}} for general path
-models, and the package \code{levysim} for more simulation options
-(different inspection times per trajectory, other time
-transformations).
+models, and the package \code{DegradSim} for more simulation options
+(different inspection times per trajectory, other time-scaling
+functions, other processes).
 }
