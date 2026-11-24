@@ -49,6 +49,11 @@
 #'    proportion of \eqn{S^*_b \ge S}, and \eqn{H_0} is rejected when
 #'    \eqn{S} exceeds the critical value.
 #'
+#' The printed p-values are rounded to three decimals; a p-value equal to 0
+#' is printed as `< 1/B` (for instance `< 0.005` with 200 bootstrap samples),
+#' since it only means that no bootstrap statistic reached the observed one.
+#' The exact values are in `p.value`.
+#'
 #' **Choice of the statistics.** The `sup` statistics react to one
 #' trajectory far from the model, the `sum` statistics to a misfit shared by
 #' all the trajectories. The authors recommend the `sup` statistics for an
@@ -220,6 +225,9 @@ print.gof_test <- function(x, digits = 4, ...) {
   tab <- as.data.frame(x)
   tab$statistic <- signif(tab$statistic, digits)
   tab$critical <- signif(tab$critical, digits)
+  n_boot <- nrow(x$boot)
+  tab$p.value <- ifelse(tab$p.value == 0, paste0("< ", signif(1 / n_boot, 2)),
+                        format(round(tab$p.value, 3), nsmall = 3))
   print(tab, row.names = FALSE)
   cat("\nH0 rejected by", sum(x$reject), "of the 4 statistics.\n")
   invisible(x)
