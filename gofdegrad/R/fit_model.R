@@ -44,7 +44,7 @@
 #' the estimate is at a boundary of this interval (for instance with a
 #' single trajectory, whose trend is poorly identified).
 #'
-#' For the random-effects model `"ig_re"` (Wang and Xu, 2010), the rates
+#' For the random-effects model `"ig_re"` (model \eqn{M_3} of Peng, 2015), the rates
 #' \eqn{\delta_i} of the units are integrated out: the likelihood of the
 #' trajectory \eqn{i} has the closed form
 #' \deqn{\ell_i = \sum_j \frac{1}{2}\ln\frac{\eta \Delta t_j^2}{2\pi \Delta x_{ij}^3}
@@ -59,7 +59,10 @@
 #' quasi-Newton (BFGS) in \eqn{(\xi, \ln\sigma_\delta, \ln\eta)}, from
 #' starting values built on the rates \eqn{t_n/S_i} of the units. At least
 #' two trajectories are needed, since the differences between units are
-#' estimated from the units themselves.
+#' estimated from the units themselves. Peng (2015) maximizes the same
+#' likelihood without the truncation of \eqn{\delta_i} (the two last terms),
+#' with an EM algorithm; on the GaAs laser data the estimates agree (see the
+#' examples).
 #'
 #' **Increasing models.** The gamma, inverse Gaussian, power-law gamma and
 #' random-effects inverse Gaussian models only increase: a negative increment in the data gives an error. An
@@ -83,9 +86,9 @@
 #' measures and parametric bootstrap. *Quality and Reliability Engineering
 #' International*. \doi{10.1002/qre.70382}
 #'
-#' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
-#' degradation data. *Technometrics*, 52(2), 188-197.
-#' \doi{10.1198/TECH.2009.08197}
+#' Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+#' explanatory variables for degradation data. *Technometrics*, 57(1),
+#' 100-111. \doi{10.1080/00401706.2013.879077}
 #'
 #' @seealso [gof_models()], [sim_model()], [gof_test()], and the package
 #'   `levyfit` for confidence intervals and more estimation options.
@@ -131,7 +134,11 @@
 #'   laser <- data.frame(id = laser$unit, t = laser$hours, X = laser$increase)
 #'   fit_model(laser, "wiener")
 #'   fit_model(laser, "wiener_power")
-#'   fit_model(laser, "ig_re")
+#'   e <- fit_model(laser, "ig_re")
+#'   e
+#'   # In the notation of Peng (2015, Table 3, model M3): xi = 509,
+#'   # sigma_mu = 0.76, lambda = 7.19e-5
+#'   c(xi = e[["xi"]], sigma_mu = e[["sd_delta"]] * sqrt(e[["eta"]]), lambda = e[["eta"]])
 #' }
 #' @export
 fit_model <- function(x, model, t = NULL) {
@@ -208,9 +215,9 @@ check_estimate <- function(est, mod) {
 #' variates using transformations with multiple roots. *The American
 #' Statistician*, 30(2), 88-90. \doi{10.1080/00031305.1976.10479147}
 #'
-#' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
-#' degradation data. *Technometrics*, 52(2), 188-197.
-#' \doi{10.1198/TECH.2009.08197}
+#' Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+#' explanatory variables for degradation data. *Technometrics*, 57(1),
+#' 100-111. \doi{10.1080/00401706.2013.879077}
 #'
 #' @seealso [gof_models()], [fit_model()], [sim_path()] for general path
 #'   models, and the package `DegradSim` for more simulation options

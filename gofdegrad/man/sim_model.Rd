@@ -104,9 +104,9 @@ Michael, J. R., Schucany, W. R. and Haas, R. W. (1976). Generating random
 variates using transformations with multiple roots. \emph{The American
 Statistician}, 30(2), 88-90. \doi{10.1080/00031305.1976.10479147}
 
-Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
-degradation data. \emph{Technometrics}, 52(2), 188-197.
-\doi{10.1198/TECH.2009.08197}
+Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+explanatory variables for degradation data. \emph{Technometrics}, 57(1),
+100-111. \doi{10.1080/00401706.2013.879077}
 }
 \seealso{
 \code{\link[=gof_models]{gof_models()}}, \code{\link[=fit_model]{fit_model()}}, \code{\link[=sim_path]{sim_path()}} for general path

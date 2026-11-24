@@ -51,14 +51,32 @@ frame by \link[=as.data.frame.gof_test]{as.data.frame()} and plotted by
    \code{"meixner"} \tab Meixner \tab \code{a}, \code{b}, \code{d}, \code{m} \cr
    \code{"wiener_power"} \tab Wiener, trend \eqn{\mu t^r} \tab \code{mu}, \code{sigma}, \code{r} \cr
    \code{"gamma_power"} \tab gamma, shape function \eqn{a t^r} \tab \code{a}, \code{b}, \code{r} \cr
-   \code{"ig_re"} \tab inverse Gaussian, one rate per unit \tab \code{xi}, \code{sd_delta}, \code{eta} \cr
+   \code{"ig_re"} \tab inverse Gaussian with random drift (Peng, 2015, model \eqn{M_3}) \tab \code{xi}, \code{sd_delta}, \code{eta} \cr
 }
 
 
 The first five are Lévy processes, estimated with the package \code{levyfit}
 and simulated with the package \code{DegradSim}: all the units follow the same
-process. In the random-effects model \code{"ig_re"}, each unit degrades at its
-own mean rate, drawn from a common distribution (Wang and Xu, 2010).
+process, with the same parameters.
+
+The model \code{"ig_re"} is an inverse Gaussian process with random drift:
+each unit \eqn{i} degrades at its own mean rate \eqn{\mu_i = 1/\delta_i},
+and these rates vary from unit to unit around a common value:
+\itemize{
+\item \code{xi} (\eqn{\xi}): mean of \eqn{\delta_i = 1/\mu_i}, so that
+\eqn{1/\xi} is a typical degradation rate;
+\item \code{sd_delta} (\eqn{\sigma_\delta}): standard deviation of the
+\eqn{\delta_i}, the unit-to-unit variability
+(\eqn{\delta_i \sim N(\xi, \sigma_\delta^2)}, truncated to
+\eqn{\delta_i > 0});
+\item \code{eta} (\eqn{\eta}): shape parameter, common to all the units, the
+variability within a trajectory: given \eqn{\delta_i},
+\eqn{X_i(t) - X_i(s) \sim IG((t - s)/\delta_i, \eta (t - s)^2)}.
+}
+
+With \code{sd_delta} close to 0 it reduces to the model \code{"ig"} with
+\eqn{\mu = 1/\xi}. It is the suitable model when some units are
+consistently faster than others, as for the GaAs laser data.
 \code{\link[=gof_models]{gof_models()}} gives the law of the increments of each model. Any other
 model, for instance a general path model, can be tested with
 \code{\link[=custom_model]{custom_model()}}.
@@ -128,6 +146,10 @@ Business and Industry}, 31(1), 16-32. \doi{10.1002/asmb.2063}
 Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
 degradation data. \emph{Technometrics}, 52(2), 188-197.
 \doi{10.1198/TECH.2009.08197}
+
+Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+explanatory variables for degradation data. \emph{Technometrics}, 57(1),
+100-111. \doi{10.1080/00401706.2013.879077}
 
 Meeker, W. Q., Escobar, L. A. and Pascual, F. G. (2021). \emph{Statistical
 Methods for Reliability Data}, 2nd edition. Wiley.

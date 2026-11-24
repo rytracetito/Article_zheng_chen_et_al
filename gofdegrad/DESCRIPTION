@@ -11,8 +11,8 @@ Description: Goodness-of-fit test for degradation models of Zheng, Wang,
     parametric bootstrap. Eight candidate models are available (Wiener, gamma,
     inverse Gaussian, variance-gamma and Meixner processes, Wiener and gamma
     processes with power-law time transformation, and inverse Gaussian
-    process with random drift of Wang and Xu (2010)
-    <doi:10.1198/TECH.2009.08197>), with possibly
+    process with random drift of Peng (2015)
+    <doi:10.1080/00401706.2013.879077>), with possibly
     irregular inspection times common to all trajectories; any other model can
     be tested by giving its own estimation and simulation functions. The
     simulations rely on the package 'DegradSim' and the maximum likelihood

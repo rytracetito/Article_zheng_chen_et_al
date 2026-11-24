@@ -44,15 +44,24 @@ negative.
 of Zheng et al. (2026): the trend is transformed, not the variance.
 \item \code{"gamma_power"}: gamma process with shape function \eqn{a t^r} and
 rate \eqn{b}; increasing.
-\item \code{"ig_re"}: inverse Gaussian process with random drift (Wang and Xu,
-2010). Unit \eqn{i} has its own mean degradation rate
-\eqn{\mu_i = 1/\delta_i}, where \eqn{\delta_i} follows the normal
+\item \code{"ig_re"}: inverse Gaussian process with random drift, the model
+\eqn{M_3} of Peng (2015). Unit \eqn{i} has its own mean degradation
+rate \eqn{\mu_i = 1/\delta_i}, where \eqn{\delta_i} follows the normal
 distribution \eqn{N(\xi, \sigma_\delta^2)} truncated to
 \eqn{\delta_i > 0}; given \eqn{\delta_i}, the trajectory is an inverse
 Gaussian process, \eqn{X_i(t) - X_i(s) \sim IG((t - s)/\delta_i, \eta (t - s)^2)}.
 \eqn{1/\xi} is a typical rate and \eqn{\sigma_\delta} measures the
 differences of rate between units; \eqn{\sigma_\delta \to 0} gives back
 the model \code{"ig"} with \eqn{\mu = 1/\xi}. Increasing.
+
+Peng (2015) writes \eqn{\delta_i \sim N(\xi, \sigma_\mu^2/\lambda)}
+with \eqn{\lambda = \eta}, so that \eqn{\sigma_\mu = \sigma_\delta \sqrt{\eta}},
+and does not truncate \eqn{\delta_i}, assuming
+\eqn{P(\delta_i \le 0)} negligible; the truncation used here keeps the
+model valid in all cases and changes nothing when this probability is
+negligible. The random-effects inverse Gaussian model of Wang and Xu
+(2010) is different: it lets the shape parameter vary between units
+(model \eqn{M_2} of Peng, 2015), not the rate.
 }
 
 The model \code{"ig"} assumes that all the units degrade at the same mean rate,
@@ -86,6 +95,10 @@ International}. \doi{10.1002/qre.70382}
 Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
 degradation data. \emph{Technometrics}, 52(2), 188-197.
 \doi{10.1198/TECH.2009.08197}
+
+Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+explanatory variables for degradation data. \emph{Technometrics}, 57(1),
+100-111. \doi{10.1080/00401706.2013.879077}
 
 Michael, J. R., Schucany, W. R. and Haas, R. W. (1976). Generating random
 variates using transformations with multiple roots. \emph{The American

@@ -42,13 +42,24 @@ private, a GitHub token is needed: `usethis::create_github_token()`, then
 | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 | `"wiener_power"` | Wiener, trend `mu t^r` | `mu`, `sigma`, `r` |
 | `"gamma_power"` | gamma, shape function `a t^r` | `a`, `b`, `r` |
-| `"ig_re"` | inverse Gaussian, one rate per unit (Wang and Xu, 2010) | `xi`, `sd_delta`, `eta` |
+| `"ig_re"` | inverse Gaussian with random drift (Peng, 2015, model M3) | `xi`, `sd_delta`, `eta` |
 
 `gof_models()` gives the law of the increments of each model. In the first
-seven models all the units follow the same process; in `"ig_re"` each unit
-degrades at its own mean rate, drawn from a common distribution. Any other
-model (general path model, other random effects, ...) can be tested with
-`custom_model()`.
+seven models all the units follow the same process, with the same parameters.
+
+The model `"ig_re"` lets the mean degradation rate vary from unit to unit:
+unit `i` degrades at its own rate `mu_i = 1/delta_i`, with
+
+- `xi`: mean of `delta_i = 1/mu_i`, so that `1/xi` is a typical rate;
+- `sd_delta`: standard deviation of the `delta_i`, the unit-to-unit
+  variability (`delta_i ~ N(xi, sd_delta^2)`, truncated to `delta_i > 0`);
+- `eta`: shape parameter common to all the units, the variability within a
+  trajectory (given `delta_i`, `X_i(t) - X_i(s) ~ IG((t - s)/delta_i, eta (t - s)^2)`).
+
+With `sd_delta` close to 0 it reduces to the model `"ig"`. It suits data where
+some units are consistently faster than others, such as the GaAs laser data.
+Any other model (general path model, other random effects, ...) can be tested
+with `custom_model()`.
 
 ## Getting started
 

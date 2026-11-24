@@ -45,12 +45,28 @@
 #' | `"meixner"` | Meixner | `a`, `b`, `d`, `m` |
 #' | `"wiener_power"` | Wiener, trend \eqn{\mu t^r} | `mu`, `sigma`, `r` |
 #' | `"gamma_power"` | gamma, shape function \eqn{a t^r} | `a`, `b`, `r` |
-#' | `"ig_re"` | inverse Gaussian, one rate per unit | `xi`, `sd_delta`, `eta` |
+#' | `"ig_re"` | inverse Gaussian with random drift (Peng, 2015, model \eqn{M_3}) | `xi`, `sd_delta`, `eta` |
 #'
 #' The first five are Lévy processes, estimated with the package `levyfit`
 #' and simulated with the package `DegradSim`: all the units follow the same
-#' process. In the random-effects model `"ig_re"`, each unit degrades at its
-#' own mean rate, drawn from a common distribution (Wang and Xu, 2010).
+#' process, with the same parameters.
+#'
+#' The model `"ig_re"` is an inverse Gaussian process with random drift:
+#' each unit \eqn{i} degrades at its own mean rate \eqn{\mu_i = 1/\delta_i},
+#' and these rates vary from unit to unit around a common value:
+#' * `xi` (\eqn{\xi}): mean of \eqn{\delta_i = 1/\mu_i}, so that
+#'   \eqn{1/\xi} is a typical degradation rate;
+#' * `sd_delta` (\eqn{\sigma_\delta}): standard deviation of the
+#'   \eqn{\delta_i}, the unit-to-unit variability
+#'   (\eqn{\delta_i \sim N(\xi, \sigma_\delta^2)}, truncated to
+#'   \eqn{\delta_i > 0});
+#' * `eta` (\eqn{\eta}): shape parameter, common to all the units, the
+#'   variability within a trajectory: given \eqn{\delta_i},
+#'   \eqn{X_i(t) - X_i(s) \sim IG((t - s)/\delta_i, \eta (t - s)^2)}.
+#'
+#' With `sd_delta` close to 0 it reduces to the model `"ig"` with
+#' \eqn{\mu = 1/\xi}. It is the suitable model when some units are
+#' consistently faster than others, as for the GaAs laser data.
 #' [gof_models()] gives the law of the increments of each model. Any other
 #' model, for instance a general path model, can be tested with
 #' [custom_model()].
@@ -99,6 +115,10 @@
 #' Wang, X. and Xu, D. (2010). An inverse Gaussian process model for
 #' degradation data. *Technometrics*, 52(2), 188-197.
 #' \doi{10.1198/TECH.2009.08197}
+#'
+#' Peng, C.-Y. (2015). Inverse Gaussian processes with random effects and
+#' explanatory variables for degradation data. *Technometrics*, 57(1),
+#' 100-111. \doi{10.1080/00401706.2013.879077}
 #'
 #' Meeker, W. Q., Escobar, L. A. and Pascual, F. G. (2021). *Statistical
 #' Methods for Reliability Data*, 2nd edition. Wiley.
