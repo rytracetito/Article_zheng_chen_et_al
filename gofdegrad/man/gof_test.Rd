@@ -90,6 +90,9 @@ proportion of \eqn{S^*_b \ge S}, and \eqn{H_0} is rejected when
 \eqn{S} exceeds the critical value.
 }
 
+The printed p-values are rounded to four decimal places; the exact values
+are in the element \code{p.value} of the result.
+
 \strong{Choice of the statistics.} The \code{sup} statistics react to one
 trajectory far from the model, the \code{sum} statistics to a misfit shared by
 all the trajectories. The authors recommend the \code{sup} statistics for an

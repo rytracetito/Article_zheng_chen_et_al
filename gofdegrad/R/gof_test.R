@@ -49,6 +49,9 @@
 #'    proportion of \eqn{S^*_b \ge S}, and \eqn{H_0} is rejected when
 #'    \eqn{S} exceeds the critical value.
 #'
+#' The printed p-values are rounded to four decimal places; the exact values
+#' are in the element `p.value` of the result.
+#'
 #' **Choice of the statistics.** The `sup` statistics react to one
 #' trajectory far from the model, the `sum` statistics to a misfit shared by
 #' all the trajectories. The authors recommend the `sup` statistics for an
@@ -220,6 +223,7 @@ print.gof_test <- function(x, digits = 4, ...) {
   tab <- as.data.frame(x)
   tab$statistic <- signif(tab$statistic, digits)
   tab$critical <- signif(tab$critical, digits)
+  tab$p.value <- formatC(tab$p.value, format = "f", digits = 4)
   print(tab, row.names = FALSE)
   cat("\nH0 rejected by", sum(x$reject), "of the 4 statistics.\n")
   invisible(x)
